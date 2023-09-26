@@ -1,9 +1,10 @@
 from sqlite3 import Connection
-from typing import Callable, Iterator
+from typing import Callable, Iterator, Optional
 from sqlglot.expressions import Table
 from templates import ValueColumn, SqlEnvironment, Sql
 
 from .base import Task
+from .row_factory import with_dict_factory
 
 
 class Templates:
@@ -36,6 +37,7 @@ class MapToNewTable(Task):
         table: Table,
         columns: list[str | ValueColumn],
         fn: Callable[..., Iterator[dict]],
+        select: Optional[str] = None,
         params: dict = {},
     ) -> None:
         super().__init__()
@@ -51,6 +53,13 @@ class MapToNewTable(Task):
                 rendered = SqlEnvironment.default.from_string(column).render(**params)
 
                 definitions.append(Sql(rendered))
+
+        if select:
+            self.scripts["Select"] = self._select = SqlEnvironment.default.from_string(
+                select
+            ).render(table=table, **params)
+        else:
+            self._select = None
 
         self.scripts[
             "Create Table"
@@ -69,7 +78,18 @@ class MapToNewTable(Task):
         self._fn = fn
 
     def run(self, conn: Connection):
-        pass
+        conn.execute(self._create_table)
+
+        def process_input(**input_row):
+            for output_row in self._fn(**input_row):
+                conn.execute(self._insert, output_row)
+
+        if self._select:
+            cursor = conn.cursor(with_dict_factory)
+            for input_row in cursor.execute(self._select):
+                process_input(**input_row)
+        else:
+            process_input()
 
     def delete(self, conn: Connection):
         conn.execute(self._drop_table)

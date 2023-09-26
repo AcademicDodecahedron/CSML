@@ -37,3 +37,19 @@ def parse_internalorg_folder(folder: Path):
 
         for org in parse_internalorgs(xml_path.read_text()):
             yield {"filename": filename, **org}
+
+
+def parse_internalorg_ids(xml: str):
+    sel = Selector(xml, type="xml")
+
+    for id_node in sel.xpath("/ids/id"):
+        yield {
+            "id_value": id_node.xpath("value/text()").get(),
+            "type_name": Maybe.from_optional(id_node.xpath("type/@uri").get())
+            .map(
+                lambda uri: uri.replace(
+                    "/dk/atira/pure/organisation/organisationsources/", ""
+                )
+            )
+            .value_or(None),
+        }

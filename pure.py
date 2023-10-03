@@ -1,11 +1,12 @@
 from pathlib import Path
 import sqlite3
 
-from templates import table, ValueColumn
-from tasks import MapToNewTable
-from parsers.internalorgs import parse_internalorg_folder, parse_internalorg_ids
-from parsers.externalorgs import parse_externalorg_folder, parse_externalorg_ids
-from parsers.internalpersons import (
+from lib import table, ValueColumn, MapToNewTable, with_args, pop_id_fields
+from parsers.pure import (
+    parse_internalorg_folder,
+    parse_internalorg_ids,
+    parse_externalorg_folder,
+    parse_externalorg_ids,
     parse_internalperson_folder,
     parse_internalperson_ids,
     parse_internalperson_variants,
@@ -20,22 +21,6 @@ TABLE_internalpersons = table("internalpersons")
 TABLE_internalperson_ids = table("internalperson_ids")
 TABLE_internalperson_variants = table("internalperson_name_variants")
 TABLE_internalperson_associations = table("internalperson_associations")
-
-
-def with_args(fn, **add_kwargs):
-    def wrapper(**kwargs):
-        yield from fn(**kwargs, **add_kwargs)
-
-    return wrapper
-
-
-def pop_id_fields(fn, *id_fields: str):
-    def wrapper(**kwargs):
-        id_values = {name: kwargs.pop(name) for name in id_fields}
-        for row in fn(**kwargs):
-            yield {**id_values, **row}
-
-    return wrapper
 
 
 Path("pure.db").unlink(missing_ok=True)

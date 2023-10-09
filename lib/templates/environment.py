@@ -5,6 +5,7 @@ import textwrap
 
 from .extension import SqltypedExtension
 from .convert import Converter, Sql
+from .types import Column
 
 
 def sqltyped_filter(value: Any) -> str:
@@ -42,6 +43,8 @@ class SqlEnvironment(Environment):
 
     def _prepare_environment(self):
         self.add_extension(SqltypedExtension)
+
+        self.globals["Column"] = Column
         self.filters["sqltyped"] = sqltyped_filter
         self.filters["sqljoin"] = sqljoin_filter
         self.filters["sql"] = sql_filter

@@ -6,7 +6,10 @@ from lib import (
     MapToNewTable,
     ValueColumn,
     CreateTableSql,
+    AddColumnsSql,
     with_args,
+    placeholder,
+    SqlEnvironment,
 )
 from parsers.scival import (
     parse_record_folder,
@@ -16,6 +19,7 @@ from parsers.scival import (
 )
 
 TABLE_records = table("records")
+TABLE_sources = table("sources")
 TABLE_record_ids = table("record_ids")
 TABLE_record_authors = table("record_authors")
 TABLE_record_affiliation = table("record_affiliation")
@@ -25,8 +29,8 @@ TABLE_record_metrics = table("record_metrics")
 
 id_slice = 1
 
-Path("scival.db").unlink(missing_ok=True)
-with sqlite3.connect("scival.db") as conn:
+Path("tmp.scival.db").unlink(missing_ok=True)
+with sqlite3.connect("tmp.scival.db") as conn:
     MapToNewTable(
         table=TABLE_records,
         columns=[
@@ -36,7 +40,7 @@ with sqlite3.connect("scival.db") as conn:
             ValueColumn("eid", "TEXT"),
             ValueColumn("citations", "TEXT"),
             ValueColumn("year", "TEXT"),
-            ValueColumn("source_id", "TEXT"),
+            ValueColumn("num_source", "TEXT", placeholder("source_id")),
             ValueColumn("doi", "TEXT"),
             ValueColumn("source_type", "TEXT"),
             ValueColumn("scopus_source_title", "TEXT"),
@@ -79,6 +83,17 @@ with sqlite3.connect("scival.db") as conn:
         ),
     ).run(conn)
     CreateTableSql(
+        table=TABLE_sources,
+        sql=Path("./parsers/scival/csml_source.sql").read_text(),
+        params={"records": TABLE_records},
+    ).run(conn)
+    AddColumnsSql(
+        table=TABLE_records,
+        sql=Path("./parsers/scival/map_source_id.sql").read_text(),
+        params={"sources": TABLE_sources},
+    ).run(conn)
+
+    CreateTableSql(
         table=TABLE_record_ids,
         sql=Path("./parsers/scival/record_ids.sql").read_text(),
         params={"records": TABLE_records},
@@ -107,6 +122,7 @@ with sqlite3.connect("scival.db") as conn:
         ],
         fn=split_column("afid"),
     ).run(conn)
+
     MapToNewTable(
         source_table=TABLE_records,
         select="""\
@@ -136,6 +152,20 @@ with sqlite3.connect("scival.db") as conn:
             "THE_field_name",
         ),
     ).run(conn)
+    AddColumnsSql(
+        sql=Path("./parsers/scival/map_type_category.sql").read_text(),
+        table=TABLE_record_category,
+        params={
+            "mapping": {
+                "asjc": 5,
+                "institutions": 25,
+                "scopus_affiliation_ids": 9,
+                "scopus_affiliation_names": 24,
+                "QS_Subject_field_name": "QS_Subject_field_name",
+                "THE_field_name": "THE_field_name",
+            }
+        },
+    ).run(conn)
     CreateTableSql(
         table=TABLE_record_topics,
         sql=Path("./parsers/scival/record_topics.sql").read_text(),
@@ -146,3 +176,28 @@ with sqlite3.connect("scival.db") as conn:
         sql=Path("./parsers/scival/record_metrics.sql").read_text(),
         params={"records": TABLE_records},
     ).run(conn)
+
+Path("scival.db").unlink(missing_ok=True)
+with sqlite3.connect("scival.db") as conn:
+    for sql_path in [
+        "./schema/csml_source.sql",
+        "./schema/pure_record.sql",
+        "./schema/csml_record_topics.sql",
+        "./schema/csml_record_metrics.sql",
+        "./schema/csml_record_category_metrics.sql",
+        "./schema/csml_category_classification_code.sql",
+    ]:
+        print("Running", sql_path)
+        conn.executescript(Path(sql_path).read_text())
+
+    conn.execute("ATTACH DATABASE 'tmp.scival.db' AS 'tmp'")
+    conn.executescript(
+        SqlEnvironment.default.from_string(Path("./from_tmp.sql").read_text()).render(
+            slice=0
+        )
+    )
+    conn.executescript(
+        SqlEnvironment.default.from_string(
+            Path("./postprocess.sql").read_text()
+        ).render(slice=0)
+    )

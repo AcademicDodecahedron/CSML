@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from returns.maybe import Maybe
 
 from .convert import ToSql, Converter
-from .environment import SqlEnvironment
 
 
 def identifier(name: str) -> exp.Identifier:
@@ -23,6 +22,32 @@ def placeholder(name: Optional[str] = None) -> exp.Placeholder:
     return exp.Placeholder(this=name)
 
 
+class Column:
+    def __init__(self, name: str, type: str) -> None:
+        self.name = name
+        self.type = type
+
+    def render(self, **params):
+        from .environment import SqlEnvironment
+
+        return ColumnRendered(
+            self.name,
+            SqlEnvironment.default.from_string(self.type).render(**params),
+        )
+
+
+@dataclass
+class ColumnRendered:
+    name: str
+    type: str
+
+    def identifier(self) -> exp.Identifier:
+        return identifier(self.name)
+
+    def definition(self) -> ColumnDefinition:
+        return ColumnDefinition(self)
+
+
 _FROM_NAME = object()
 
 
@@ -33,6 +58,8 @@ class ValueColumn:
         self.value = placeholder(name) if value == _FROM_NAME else value
 
     def render(self, **params):
+        from .environment import SqlEnvironment
+
         return ValueColumnRendered(
             self.name,
             SqlEnvironment.default.from_string(self.type).render(**params),
@@ -41,27 +68,19 @@ class ValueColumn:
 
 
 @dataclass
-class ValueColumnRendered:
-    name: str
-    type: str
+class ValueColumnRendered(ColumnRendered):
     value: Any
-
-    def identifier(self) -> exp.Identifier:
-        return identifier(self.name)
-
-    def definition(self) -> ColumnDefinition:
-        return ColumnDefinition(self)
 
     def set_statement(self) -> ValueColumnSetStatement:
         return ValueColumnSetStatement(self)
 
 
 class ColumnDefinition(ToSql):
-    def __init__(self, value_column: ValueColumnRendered) -> None:
-        self._value_column = value_column
+    def __init__(self, column: ColumnRendered) -> None:
+        self.column = column
 
     def sql(self) -> str:
-        return f"{self._value_column.identifier()} {self._value_column.type}"
+        return f"{self.column.identifier()} {self.column.type}"
 
 
 class ValueColumnSetStatement(ToSql):

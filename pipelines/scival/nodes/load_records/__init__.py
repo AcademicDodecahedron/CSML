@@ -14,5 +14,5 @@ def load_records_csv_or_folder(path: Path, header_length: int, mapping: dict[str
     for csv_path in path.glob("*.csv") if path.is_dir() else [path]:
         filename = csv_path.name
 
-        for row in load_records_csv_or_folder(csv_path, header_length, mapping):
+        for row in load_records_csv(csv_path, header_length, mapping):
             yield {"filename": filename, **row}

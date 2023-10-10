@@ -1,9 +1,8 @@
 from pathlib import Path
-from typing import Literal
-from pydantic import BaseModel
 
 from lib import (
     table,
+    identifier,
     MapToNewTable,
     CreateTableSql,
     AddColumnsSql,
@@ -11,16 +10,9 @@ from lib import (
     with_args,
     placeholder,
 )
+from .config import ScivalConfig
 from .nodes.load_records import load_records_csv_or_folder
-from .nodes.split_column import split_column, split_columns_many
-
-
-class ScivalConfig(BaseModel):
-    type: Literal["scival"]
-    path: Path
-    header_length: int
-    fields: dict[str, str]
-    category_mapping: dict[str, int | str]
+from .nodes.split_column import split_column, split_categories
 
 
 def create_tasks(config: ScivalConfig):
@@ -132,35 +124,23 @@ def create_tasks(config: ScivalConfig):
             ],
             fn=split_column("afid"),
         ),
-        "record_category": {
-            "create": MapToNewTable(
-                source_table=table_records,
-                select="""\
-                    SELECT
-                        asjc,
-                        institutions,
-                        scopus_affiliation_ids,
-                        scopus_affiliation_names,
-                        QS_Subject_field_name,
-                        THE_field_name,
-                        filename,
-                        id_record
-                    FROM {{source}}""",
-                table=table_record_category,
-                columns=[
-                    ValueColumn("field_name", "TEXT"),
-                    ValueColumn("value_category", "TEXT"),
-                    ValueColumn("filename", "TEXT"),
-                    ValueColumn("id_record", "INT REFERENCES {{source}}(id_record)"),
-                ],
-                fn=split_columns_many(*config.category_mapping.keys()),
-            ),
-            "map": AddColumnsSql(
-                sql=parent_folder.joinpath("./nodes/map_type_category.sql").read_text(),
-                table=table_record_category,
-                params={"mapping": config.category_mapping},
-            ),
-        },
+        "record_category": MapToNewTable(
+            source_table=table_records,
+            select="""\
+                SELECT
+                id_record,
+                {{ select | sqljoin(',\\n') }}
+                FROM {{source}}""",
+            table=table_record_category,
+            columns=[
+                ValueColumn("field_name", "TEXT"),
+                ValueColumn("value_category", "TEXT"),
+                ValueColumn("type_category", "INT"),
+                ValueColumn("id_record", "INT REFERENCES {{source}}(id_record)"),
+            ],
+            fn=split_categories(config.category_mapping),
+            params={"select": list(map(identifier, config.category_mapping.keys()))},
+        ),
         "record_topics": CreateTableSql(
             table=table_record_topics,
             sql=parent_folder.joinpath("./nodes/record_topics.sql").read_text(),

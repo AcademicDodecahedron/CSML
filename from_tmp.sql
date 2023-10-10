@@ -70,6 +70,16 @@ select id_record,
        ProminencePercentile
 from tmp.record_topics;
 
+insert into csml_source(id_source, id_slice, source_title, issn_norm, num_source, source_type)
+select
+    id_source,
+    {{slice}},
+    source_title,
+    issn,
+    num_source,
+    source_type
+from tmp.sources;
+
 -- insert into csml_record_author_rel_affiliation(id_record_author, id_record_affiliation)
 -- select id_record_author,
 --        id_record_affiliation

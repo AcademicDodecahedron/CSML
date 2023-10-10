@@ -99,7 +99,6 @@ create table csml_type_category
     type_category_database text
 );
 
-
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (1, 'heading', 'WoS');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (2, 'subheading', 'WoS');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (5, 'ASJC', 'Scopus');
@@ -126,16 +125,17 @@ INSERT INTO csml_type_category (type_category, name_type_category, type_category
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (24, 'Scopusaffiliationnames', 'Scopus / SciVal');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (25, 'Institutions SciVal', 'SciVal');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (26, 'SNIP ASJC', 'Scopus');
-INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (27, 'Институт/Факультет', 'локальные системы организаций');
-INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (28, 'Кафедра', 'локальные системы организаций');
-INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (29, 'Институт/Факультет#Кафедра', 'локальные системы организаций');
-INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (30, 'Парк или Университет', 'локальные системы организаций Сеченовский университет');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (31, 'CiteScore ASJC', 'Scopus');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (32, 'SNTR', 'СНТР');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (33, 'ARWU Subject 2020', 'WoS');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (34, 'QSSubject from SciVal', 'SciVal');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (35, 'THESubject from SciVal', 'SciVal');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (36, 'SustainableDevelopmentGoals', 'SciVal');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (28, 'Кафедра', 'Local Org System');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (29, 'Институт/Факультет#Кафедра', 'Local Org System');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (27, 'Институт/Факультет', 'Local Org System ');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (30, 'Парк или Университет', 'Local Org System');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (37, 'Source File', 'MultiFiles Load');
 
 
 create table csml_record_category

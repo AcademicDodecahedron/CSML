@@ -162,5 +162,6 @@ cython_debug/
 #.idea/
 
 *.db
+*.sqlite
 *.ju.py
 *.ipynb

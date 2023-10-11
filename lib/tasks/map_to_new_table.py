@@ -2,7 +2,7 @@ from sqlite3 import Connection
 from typing import Callable, Iterator, Optional
 from sqlglot.expressions import Table
 
-from lib.templates import ValueColumn, SqlEnvironment, Sql
+from lib.templates import ValueColumn, ValueColumnRendered, SqlEnvironment, Sql
 from .base import Task
 from .row_factory import with_dict_factory
 
@@ -35,7 +35,7 @@ class MapToNewTable(Task):
     def __init__(
         self,
         table: Table,
-        columns: list[str | ValueColumn],
+        columns: list[str | ValueColumn | ValueColumnRendered],
         fn: Callable[..., Iterator[dict]],
         select: Optional[str] = None,
         source_table: Optional[Table] = None,
@@ -47,17 +47,21 @@ class MapToNewTable(Task):
 
         definitions, insert_columns = [], []
         for column in columns:
-            if isinstance(column, ValueColumn):
-                rendered = column.render(**params_merged)
-
-                insert_columns.append(rendered)
-                definitions.append(rendered.definition())
-            else:
+            if isinstance(column, str):
                 rendered = SqlEnvironment.default.from_string(column).render(
                     **params_merged
                 )
 
                 definitions.append(Sql(rendered))
+            else:
+                rendered = (
+                    column.render(**params_merged)
+                    if isinstance(column, ValueColumn)
+                    else column
+                )
+
+                insert_columns.append(rendered)
+                definitions.append(rendered.definition())
 
         if select:
             self.scripts["Select"] = self._select = SqlEnvironment.default.from_string(

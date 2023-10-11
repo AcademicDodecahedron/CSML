@@ -19,7 +19,7 @@ source:
     Topic number: topic_number
     Field-Weighted Citation Impact: field_weighted_citation_impact
     Quacquarelli Symonds (QS) Subject field name: QS_Subject_field_name
-    Source ID: source_id
+    Source ID: num_source
     Number of Authors: number_of_authors
     Publication type: publication_type
     Quacquarelli Symonds (QS) Subject code: QS_Subject_code
@@ -43,9 +43,6 @@ source:
     SNIP (publication year): snip
     Topic name: topic_name
   category_mapping:
-    filename:
-      type: 37
-      split: false
     country: 23
     institutions: 25
     asjc: 5

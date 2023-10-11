@@ -16,29 +16,28 @@ from .nodes.split_column import split_column, split_categories
 
 
 def create_tasks(config: ScivalConfig):
+    table_records_raw = table("records_raw")
     table_records = table("records")
     table_sources = table("sources")
     table_record_ids = table("record_ids")
     table_record_authors = table("record_authors")
     table_record_affiliation = table("record_affiliation")
+    table_category_split = table("category_split")
     table_record_category = table("record_category")
     table_record_topics = table("record_topics")
     table_record_metrics = table("record_metrics")
 
     parent_folder = Path(__file__).parent
 
-    return {
-        "records": MapToNewTable(
-            table=table_records,
-            columns=[
-                "id_record INTEGER PRIMARY KEY AUTOINCREMENT",
-                ValueColumn("filename", "TEXT"),
+    record_columns = list(
+        map(
+            lambda col: col.render(),
+            [
                 ValueColumn("sgr", "TEXT"),
                 ValueColumn("eid", "TEXT"),
                 ValueColumn("citations", "TEXT"),
                 ValueColumn("year", "TEXT"),
-                # Rename "source_id" field to "num_source"
-                ValueColumn("num_source", "TEXT", placeholder("source_id")),
+                ValueColumn("num_source", "TEXT"),
                 ValueColumn("doi", "TEXT"),
                 ValueColumn("source_type", "TEXT"),
                 ValueColumn("scopus_source_title", "TEXT"),
@@ -76,13 +75,30 @@ def create_tasks(config: ScivalConfig):
                 ValueColumn("QS_Subject_field_name", "TEXT"),
                 ValueColumn("THE_field_name", "TEXT"),
             ],
-            fn=with_args(
-                load_records_csv_or_folder,
-                path=config.path,
-                header_length=config.header_length,
-                mapping=config.fields,
+        )
+    )
+
+    return {
+        "records": {
+            "load": MapToNewTable(
+                table=table_records_raw,
+                columns=[
+                    ValueColumn("filename", "TEXT"),
+                    *record_columns,
+                ],
+                fn=with_args(
+                    load_records_csv_or_folder,
+                    path=config.path,
+                    header_length=config.header_length,
+                    mapping=config.fields,
+                ),
             ),
-        ),
+            "dedupe": CreateTableSql(
+                table=table_records,
+                sql=parent_folder.joinpath("./nodes/dedupe_records.sql").read_text(),
+                params={"raw": table_records_raw, "record_columns": record_columns},
+            ),
+        },
         "sources": {
             "create": CreateTableSql(
                 table=table_sources,
@@ -124,23 +140,34 @@ def create_tasks(config: ScivalConfig):
             ],
             fn=split_column("afid"),
         ),
-        "record_category": MapToNewTable(
-            source_table=table_records,
-            select="""\
+        "record_category": {
+            "split": MapToNewTable(
+                source_table=table_records,
+                select="""\
                 SELECT
                 id_record,
                 {{ select | sqljoin(',\\n') }}
                 FROM {{source}}""",
-            table=table_record_category,
-            columns=[
-                ValueColumn("field_name", "TEXT"),
-                ValueColumn("value_category", "TEXT"),
-                ValueColumn("type_category", "INT"),
-                ValueColumn("id_record", "INT REFERENCES {{source}}(id_record)"),
-            ],
-            fn=split_categories(config.category_mapping),
-            params={"select": map(identifier, config.category_mapping.keys())},
-        ),
+                table=table_category_split,
+                columns=[
+                    ValueColumn("field_name", "TEXT"),
+                    ValueColumn("value_category", "TEXT"),
+                    ValueColumn("type_category", "INT"),
+                    ValueColumn("id_record", "INT REFERENCES {{source}}(id_record)"),
+                ],
+                fn=split_categories(config.category_mapping),
+                params={"select": map(identifier, config.category_mapping.keys())},
+            ),
+            "add_filename": CreateTableSql(
+                table=table_record_category,
+                sql=parent_folder.joinpath("./nodes/category_filename.sql").read_text(),
+                params={
+                    "split": table_category_split,
+                    "records": table_records,
+                    "records_raw": table_records_raw,
+                },
+            ),
+        },
         "record_topics": CreateTableSql(
             table=table_record_topics,
             sql=parent_folder.joinpath("./nodes/record_topics.sql").read_text(),

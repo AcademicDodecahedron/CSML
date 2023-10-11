@@ -28,6 +28,7 @@ def run_sequence(sequence: dict, conn: sqlite3.Connection):
         print("Running", name)
         if isinstance(task, Task):
             task.run(conn)
+            conn.commit()
         else:
             run_sequence(task, conn)
 

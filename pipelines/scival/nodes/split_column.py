@@ -1,8 +1,5 @@
 import re
 
-from ..config import TypeCategory
-
-
 _DELIMITER = re.compile(r"[,|]\s*")
 
 
@@ -16,26 +13,20 @@ def split_column(column_name: str):
     return split_column_inner
 
 
-def split_categories(category_mapping: dict[str, TypeCategory]):
+def split_categories(category_mapping: dict[str, int | str]):
     def split_categories_inner(id_record: int, **kwargs):
         for column_name, category in category_mapping.items():
             header = {
                 "id_record": id_record,
                 "field_name": column_name,
-                "type_category": category.type,
+                "type_category": category,
             }
             column_value = kwargs[column_name]
 
-            if category.split:
-                if column_value == "-":
-                    continue
+            if column_value == "-":
+                continue
 
-                for split_value in _DELIMITER.split(kwargs[column_name]):
-                    yield {**header, "value_category": split_value}
-            else:
-                yield {
-                    **header,
-                    "value_category": column_value,
-                }
+            for split_value in _DELIMITER.split(kwargs[column_name]):
+                yield {**header, "value_category": split_value}
 
     return split_categories_inner

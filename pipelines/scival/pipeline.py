@@ -7,6 +7,7 @@ from lib import (
     CreateTableSql,
     AddColumnsSql,
     ValueColumn,
+    Column,
     with_args,
 )
 from .config import ScivalConfig
@@ -28,7 +29,6 @@ def create_tasks(config: ScivalConfig):
 
     record_columns = [
         *map(lambda name: ValueColumn(name, "TEXT").render(), config.fields.values()),
-        ValueColumn("sgr", "TEXT").render(),
     ]
 
     parent_folder = Path(__file__).parent
@@ -52,6 +52,13 @@ def create_tasks(config: ScivalConfig):
                 table=table_records,
                 sql=parent_folder.joinpath("./nodes/dedupe_records.sql").read_text(),
                 params={"raw": table_records_raw, "record_columns": record_columns},
+            ),
+            "sgr": AddColumnsSql(
+                table=table_records,
+                columns=[Column("sgr", "TEXT")],
+                sql="""\
+                UPDATE {{table}}
+                SET sgr = REPLACE(eid, '2-s2.0-', '')""",
             ),
         },
         "sources": {

@@ -1,13 +1,12 @@
 from pathlib import Path
 
-from .incites_csv import IncitesCsvReader
+from .incites_csv import incited_csv_reader
 
 
 def load_records_csv(path: Path, header_length: int, mapping: dict[str, str]):
     with path.open(encoding="utf-8-sig") as file:
-        for row in IncitesCsvReader(file, header_length, mapping):
-            row["sgr"] = row["eid"].replace("2-s2.0-", "")
-            yield row
+        for row in incited_csv_reader(file, header_length):
+            yield {mapping[key]: value for key, value in row.items() if key in mapping}
 
 
 def load_records_csv_or_folder(path: Path, header_length: int, mapping: dict[str, str]):

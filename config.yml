@@ -52,9 +52,13 @@ source:
     THE_field_name: 35
 
 schema:
-  - ./schema/csml_source.sql
-  - ./schema/pure_record.sql
-  - ./schema/csml_record_topics.sql
-  - ./schema/csml_record_metrics.sql
-  - ./schema/csml_record_category_metrics.sql
-  - ./schema/csml_category_classification_code.sql
+  - ./sql/schema/csml_source.sql
+  - ./sql/schema/pure_record.sql
+  - ./sql/schema/csml_record_topics.sql
+  - ./sql/schema/csml_record_metrics.sql
+  - ./sql/schema/csml_record_category_metrics.sql
+  - ./sql/schema/csml_category_classification_code.sql
+
+export:
+  - ./sql/export/export_scival.sql
+  - ./sql/export/postprocess_scival.sql

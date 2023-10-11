@@ -12,6 +12,7 @@ from pipelines import scival, pure, SourceConfig
 class CsmlConfig(BaseModel):
     source: SourceConfig
     sql_schema: list[Path] = Field(alias="schema")
+    export: list[Path]
 
 
 def pipeline_from_config(config: SourceConfig) -> dict:
@@ -61,13 +62,10 @@ if __name__ == "__main__":
         conn.execute(
             "ATTACH DATABASE {} AS 'tmp'".format(Literal.string(temp_db).sql())
         )
-        conn.executescript(
-            SqlEnvironment.default.from_string(
-                Path("./from_tmp.sql").read_text()
-            ).render(slice=0)
-        )
-        conn.executescript(
-            SqlEnvironment.default.from_string(
-                Path("./postprocess.sql").read_text()
-            ).render(slice=0)
-        )
+        for script_path in config.export:
+            print("Executing ", script_path)
+            conn.executescript(
+                SqlEnvironment.default.from_string(script_path.read_text()).render(
+                    slice=0
+                )
+            )

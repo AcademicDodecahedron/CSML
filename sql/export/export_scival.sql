@@ -1,6 +1,6 @@
 insert into csml_source(id_source, id_slice, source_title, issn_norm, num_source, source_type)
 select id_source,
-       {{slice}},
+       {{slice}} as id_slice,
        source_title,
        issn,
        num_source,

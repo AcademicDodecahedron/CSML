@@ -3,8 +3,9 @@ import yaml
 from pathlib import Path
 from pydantic import BaseModel, Field
 from argparse import ArgumentParser
+from sqlglot.expressions import Literal
 
-from lib import Task
+from lib import Task, SqlEnvironment
 from pipelines import scival, pure, SourceConfig
 
 
@@ -47,3 +48,25 @@ if __name__ == "__main__":
 
     with sqlite3.connect(str(temp_db)) as conn:
         run_sequence(pipeline_from_config(config.source), conn)
+
+    args.output.unlink(True)
+    with sqlite3.connect(str(args.output)) as conn:
+        conn.execute("PRAGMA foreign_keys = 1")
+
+        for script_path in config.sql_schema:
+            print("Executing ", script_path)
+            conn.executescript(script_path.read_text())
+
+        conn.execute(
+            "ATTACH DATABASE {} AS 'tmp'".format(Literal.string(temp_db).sql())
+        )
+        conn.executescript(
+            SqlEnvironment.default.from_string(
+                Path("./from_tmp.sql").read_text()
+            ).render(slice=0)
+        )
+        conn.executescript(
+            SqlEnvironment.default.from_string(
+                Path("./postprocess.sql").read_text()
+            ).render(slice=0)
+        )

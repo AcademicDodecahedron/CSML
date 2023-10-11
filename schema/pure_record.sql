@@ -36,10 +36,7 @@ create table csml_record
 (
     id_record                                 INTEGER not null
         primary key autoincrement,
-    id_slice                                  integer           not null
-        constraint csml_record_csml_slice_id_slice_fk
-            references csml_slice,
-    file_name                                 text,
+    id_slice                                  integer           not null,
     num_record                                varchar(50)       not null,
     type_database_record                      integer           not null
         constraint csml_record_csml_type_database_record_type_database_record_fk
@@ -148,8 +145,7 @@ create table csml_record_category
     type_category      integer                                                                          not null
         constraint csml_record_category_type_category_fk
             references csml_type_category,
-    value_category     text                                                                             not null,
-    file_name          text
+    value_category     text                                                                             not null
 );
 
 
@@ -199,9 +195,7 @@ create table csml_record_relation
     id_record     integer not null
         constraint csml_record_relation_csml_record_id_record_fk
             references csml_record,
-    id_slice_to   integer not null
-        constraint csml_record_relation_csml_slice_id_slice_to_fk
-            references csml_slice,
+    id_slice_to   integer not null,
     id_record_rel integer not null
         constraint csml_record_relation_csml_record_id_record_rel_fk
             references csml_record,
@@ -238,8 +232,6 @@ create table csml_record_author
     preferred_surname      text,
     preferred_givenname    text,
     id_pure_person         integer
-        constraint csml_record_author_csml_pure_person_id_pure_person_fk
-            references csml_pure_person
 );
 
 create table csml_record_affiliation
@@ -262,8 +254,7 @@ create table csml_record_affiliation
     city_group            text,
     country_code          text,
     id_pure_org           integer
-        constraint csml_record_affiliation_csml_pure_org_id_pure_org_fk
-            references csml_pure_org,
+        constraint csml_record_affiliation_csml_pure_org_id_pure_org_fk,
     only_record_level     integer default 0,
     reprint               varchar(10)
 );
@@ -300,9 +291,7 @@ create table csml_pure_project
 (
     id_project         INTEGER not null
         primary key autoincrement,
-    id_slice           integer                                                          not null
-        constraint csml_pure_project_csml_slice_id_slice_fk
-            references csml_slice,
+    id_slice           integer                                                          not null,
     num_source         text,
     typeclassification text,
     title              text

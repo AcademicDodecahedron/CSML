@@ -51,8 +51,8 @@ source:
     asjc: 5
     scopus_affiliation_ids: 9
     scopus_affiliation_names: 24
-    QS_Subject_field_name: QS_Subject_field_name
-    THE_field_name: THE_field_name
+    QS_Subject_field_name: 34
+    THE_field_name: 35
 
 schema:
   - ./schema/csml_source.sql

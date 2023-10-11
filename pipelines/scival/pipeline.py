@@ -139,7 +139,7 @@ def create_tasks(config: ScivalConfig):
                 ValueColumn("id_record", "INT REFERENCES {{source}}(id_record)"),
             ],
             fn=split_categories(config.category_mapping),
-            params={"select": list(map(identifier, config.category_mapping.keys()))},
+            params={"select": map(identifier, config.category_mapping.keys())},
         ),
         "record_topics": CreateTableSql(
             table=table_record_topics,

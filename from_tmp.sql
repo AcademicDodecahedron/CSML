@@ -1,11 +1,10 @@
 insert into csml_source(id_source, id_slice, source_title, issn_norm, num_source, source_type)
-select
-    id_source,
-    {{slice}},
-    source_title,
-    issn,
-    num_source,
-    source_type
+select id_source,
+       {{slice}},
+       source_title,
+       issn,
+       num_source,
+       source_type
 from tmp.sources;
 
 insert into csml_record (id_record, id_slice, type_database_record, num_record, cited_from_record, year_publ,

@@ -2,9 +2,7 @@ create table csml_source
 (
     id_source                   serial
         primary key,
-    id_slice                    integer           not null
-        constraint csml_source_csml_slice_id_slice_fk
-            references csml_slice,
+    id_slice                    integer           not null,
     num_source                  text,
     source_title                text,
     source_abbrev               text,

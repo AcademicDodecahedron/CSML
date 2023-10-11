@@ -36,10 +36,7 @@ create table csml_record
 (
     id_record                                 INTEGER not null
         primary key autoincrement,
-    id_slice                                  integer           not null
-        constraint csml_record_csml_slice_id_slice_fk
-            references csml_slice,
-    file_name                                 text,
+    id_slice                                  integer           not null,
     num_record                                varchar(50)       not null,
     type_database_record                      integer           not null
         constraint csml_record_csml_type_database_record_type_database_record_fk
@@ -99,7 +96,6 @@ create table csml_type_category
     type_category_database text
 );
 
-
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (1, 'heading', 'WoS');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (2, 'subheading', 'WoS');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (5, 'ASJC', 'Scopus');
@@ -126,16 +122,17 @@ INSERT INTO csml_type_category (type_category, name_type_category, type_category
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (24, 'Scopusaffiliationnames', 'Scopus / SciVal');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (25, 'Institutions SciVal', 'SciVal');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (26, 'SNIP ASJC', 'Scopus');
-INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (27, 'Институт/Факультет', 'локальные системы организаций');
-INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (28, 'Кафедра', 'локальные системы организаций');
-INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (29, 'Институт/Факультет#Кафедра', 'локальные системы организаций');
-INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (30, 'Парк или Университет', 'локальные системы организаций Сеченовский университет');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (31, 'CiteScore ASJC', 'Scopus');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (32, 'SNTR', 'СНТР');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (33, 'ARWU Subject 2020', 'WoS');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (34, 'QSSubject from SciVal', 'SciVal');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (35, 'THESubject from SciVal', 'SciVal');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (36, 'SustainableDevelopmentGoals', 'SciVal');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (28, 'Кафедра', 'Local Org System');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (29, 'Институт/Факультет#Кафедра', 'Local Org System');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (27, 'Институт/Факультет', 'Local Org System ');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (30, 'Парк или Университет', 'Local Org System');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (37, 'Source File', 'MultiFiles Load');
 
 
 create table csml_record_category
@@ -148,8 +145,7 @@ create table csml_record_category
     type_category      integer                                                                          not null
         constraint csml_record_category_type_category_fk
             references csml_type_category,
-    value_category     text                                                                             not null,
-    file_name          text
+    value_category     text                                                                             not null
 );
 
 
@@ -199,9 +195,7 @@ create table csml_record_relation
     id_record     integer not null
         constraint csml_record_relation_csml_record_id_record_fk
             references csml_record,
-    id_slice_to   integer not null
-        constraint csml_record_relation_csml_slice_id_slice_to_fk
-            references csml_slice,
+    id_slice_to   integer not null,
     id_record_rel integer not null
         constraint csml_record_relation_csml_record_id_record_rel_fk
             references csml_record,
@@ -238,8 +232,6 @@ create table csml_record_author
     preferred_surname      text,
     preferred_givenname    text,
     id_pure_person         integer
-        constraint csml_record_author_csml_pure_person_id_pure_person_fk
-            references csml_pure_person
 );
 
 create table csml_record_affiliation
@@ -262,8 +254,7 @@ create table csml_record_affiliation
     city_group            text,
     country_code          text,
     id_pure_org           integer
-        constraint csml_record_affiliation_csml_pure_org_id_pure_org_fk
-            references csml_pure_org,
+        constraint csml_record_affiliation_csml_pure_org_id_pure_org_fk,
     only_record_level     integer default 0,
     reprint               varchar(10)
 );
@@ -300,9 +291,7 @@ create table csml_pure_project
 (
     id_project         INTEGER not null
         primary key autoincrement,
-    id_slice           integer                                                          not null
-        constraint csml_pure_project_csml_slice_id_slice_fk
-            references csml_slice,
+    id_slice           integer                                                          not null,
     num_source         text,
     typeclassification text,
     title              text

@@ -1,6 +1,6 @@
 /* классификация THE */
-insert into csml_record_category(value_category,id_record,file_name,type_category)
-select distinct csml_category_classification_code.code_category_classification_code, csml_record.id_record, csml_record.file_name, 19
+insert into csml_record_category(value_category,id_record,type_category)
+select distinct csml_category_classification_code.code_category_classification_code, csml_record.id_record, 19
 from csml_category_classification_code_mapping join csml_category_classification_code
    on csml_category_classification_code_mapping.id_category_classification_code = csml_category_classification_code.id_category_classification_code
 and csml_category_classification_code_mapping.type_category_to=5
@@ -25,8 +25,8 @@ insert into csml_record_category_metrics (id_record,
 
 
 /* классификация QS */
-insert into csml_record_category(value_category,id_record,file_name,type_category)
-select distinct csml_category_classification_code.code_category_classification_code, csml_record.id_record, csml_record.file_name, 6
+insert into csml_record_category(value_category,id_record,type_category)
+select distinct csml_category_classification_code.code_category_classification_code, csml_record.id_record, 6
 from csml_category_classification_code_mapping join csml_category_classification_code
    on csml_category_classification_code_mapping.id_category_classification_code = csml_category_classification_code.id_category_classification_code
 and csml_category_classification_code_mapping.type_category_to=5

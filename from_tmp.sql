@@ -1,10 +1,19 @@
-insert into csml_record (id_record, id_slice, file_name, type_database_record, num_record, cited_from_record, year_publ,
+insert into csml_source(id_source, id_slice, source_title, issn_norm, num_source, source_type)
+select
+    id_source,
+    {{slice}},
+    source_title,
+    issn,
+    num_source,
+    source_type
+from tmp.sources;
+
+insert into csml_record (id_record, id_slice, type_database_record, num_record, cited_from_record, year_publ,
                          type_state_load,
                          id_source, scopus_sourceid, doi, source_type, source_title, document_type, authors_count,
                          issn_norm)
 select id_record,
        {{slice}} as id_slice,
-       filename,
        2 as type_database_record,
        sgr,
        citations,
@@ -32,8 +41,8 @@ select id_record_author,
        auid
 from tmp.record_authors;
 
-insert into csml_record_category (file_name, id_record, type_category, value_category)
-select filename, id_record, type_category, value_category
+insert into csml_record_category (id_record, type_category, value_category)
+select id_record, type_category, value_category
 from tmp.record_category
 where value_category is not null;
 
@@ -69,18 +78,3 @@ select id_record,
        iscluster,
        ProminencePercentile
 from tmp.record_topics;
-
-insert into csml_source(id_source, id_slice, source_title, issn_norm, num_source, source_type)
-select
-    id_source,
-    {{slice}},
-    source_title,
-    issn,
-    num_source,
-    source_type
-from tmp.sources;
-
--- insert into csml_record_author_rel_affiliation(id_record_author, id_record_affiliation)
--- select id_record_author,
---        id_record_affiliation
--- from tmp.rel_aff_joined;

@@ -8,7 +8,6 @@ from lib import (
     AddColumnsSql,
     ValueColumn,
     with_args,
-    placeholder,
 )
 from .config import ScivalConfig
 from .nodes.load_records import load_records_csv_or_folder
@@ -27,56 +26,12 @@ def create_tasks(config: ScivalConfig):
     table_record_topics = table("record_topics")
     table_record_metrics = table("record_metrics")
 
-    parent_folder = Path(__file__).parent
+    record_columns = [
+        *map(lambda name: ValueColumn(name, "TEXT").render(), config.fields.values()),
+        ValueColumn("sgr", "TEXT").render(),
+    ]
 
-    record_columns = list(
-        map(
-            lambda col: col.render(),
-            [
-                ValueColumn("sgr", "TEXT"),
-                ValueColumn("eid", "TEXT"),
-                ValueColumn("citations", "TEXT"),
-                ValueColumn("year", "TEXT"),
-                ValueColumn("num_source", "TEXT"),
-                ValueColumn("doi", "TEXT"),
-                ValueColumn("source_type", "TEXT"),
-                ValueColumn("scopus_source_title", "TEXT"),
-                ValueColumn("publication_type", "TEXT"),
-                ValueColumn("number_of_authors", "TEXT"),
-                ValueColumn("issn", "TEXT"),
-                ValueColumn("asjc", "TEXT"),
-                ValueColumn("scopus_author_ids", "TEXT"),
-                ValueColumn("scopus_affiliation_ids", "TEXT"),
-                ValueColumn("institutions", "TEXT"),
-                ValueColumn("scopus_affiliation_names", "TEXT"),
-                ValueColumn("country", "TEXT"),
-                ValueColumn("topic_number", "TEXT"),
-                ValueColumn("topic_name", "TEXT"),
-                ValueColumn("topic_prominence_percentile", "TEXT"),
-                ValueColumn("topic_cluster_number", "TEXT"),
-                ValueColumn("topic_cluster_name", "TEXT"),
-                ValueColumn("topic_cluster_prominence_percentile", "TEXT"),
-                ValueColumn("field_weighted_view_impact", "TEXT"),
-                ValueColumn("field_weighted_citation_impact", "TEXT"),
-                ValueColumn("views", "TEXT"),
-                ValueColumn(
-                    "outputs_in_top_citation_percentiles_per_percentile", "TEXT"
-                ),
-                ValueColumn(
-                    "field_weighted_outputs_in_top_citation_percentiles_per_percentile",
-                    "TEXT",
-                ),
-                ValueColumn("snip", "TEXT"),
-                ValueColumn("cite_score", "TEXT"),
-                ValueColumn("sjr", "TEXT"),
-                ValueColumn("snip_percentile", "TEXT"),
-                ValueColumn("cite_score_percentile", "TEXT"),
-                ValueColumn("sjr_percentile", "TEXT"),
-                ValueColumn("QS_Subject_field_name", "TEXT"),
-                ValueColumn("THE_field_name", "TEXT"),
-            ],
-        )
-    )
+    parent_folder = Path(__file__).parent
 
     return {
         "records": {

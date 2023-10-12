@@ -8,7 +8,9 @@ from .index import TaskTree, TaskIndex
 TaskPath = list[str] | Literal["__full__"]
 
 
-def _create_action(path: TaskPath, action_name: str, db_path: Optional[str]):
+def _create_action(
+    path: TaskPath, action_name: str, db_path: Optional[str], foreign_keys: bool = False
+):
     def action(tasks: TaskTree | TaskIndex):
         task_index = TaskIndex(tasks) if isinstance(tasks, dict) else tasks
         task = (
@@ -20,6 +22,8 @@ def _create_action(path: TaskPath, action_name: str, db_path: Optional[str]):
                 raise RuntimeError("database path not specified")
 
             with sqlite3.connect(db_path) as conn:
+                if foreign_keys:
+                    conn.execute("PRAGMA foreign_keys = 1")
                 method(conn)
 
         actions: dict[str, Callable[[Task], None]] = {
@@ -45,6 +49,7 @@ class TaskRunnerCli:
         )
         parser.add_argument("action", choices=["run", "delete", "redo", "describe"])
         parser.add_argument("-d", "--db", help="sqlite database path")
+        parser.add_argument("--fk", action="store_true", help="PRAGMA foreign_keys")
         self._argparser = parser
 
         custom_group = parser.add_argument_group("custom", "Custom arguments")
@@ -67,4 +72,6 @@ class TaskRunnerCli:
             for action in self._custom_group._group_actions
         }
 
-        return _create_action(args.task, args.action, args.db), Namespace(**custom_args)
+        return _create_action(
+            args.task, args.action, args.db, foreign_keys=args.fk
+        ), Namespace(**custom_args)

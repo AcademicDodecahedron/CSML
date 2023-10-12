@@ -13,3 +13,13 @@ class Task(ABC):
     @abstractmethod
     def delete(self, conn: Connection):
         pass
+
+    def redo(self, conn: Connection):
+        self.delete(conn)
+        self.run(conn)
+
+    def describe(self):
+        for name, script in self.scripts.items():
+            print(name)
+            print(script)
+            print()

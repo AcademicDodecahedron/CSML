@@ -49,4 +49,4 @@ class AddColumnsSql(Task):
         conn.executescript(self._sql)
 
     def delete(self, conn: Connection):
-        raise RuntimeError("DROP COLUMN is unsupported in sqlite")
+        print("DROP COLUMN is unsupported in sqlite")

@@ -66,7 +66,5 @@ class TaskRunnerCli:
             action.dest: getattr(args, action.dest)
             for action in self._custom_group._group_actions
         }
-        print(args)
-        print(custom_args)
 
         return _create_action(args.task, args.action, args.db), Namespace(**custom_args)

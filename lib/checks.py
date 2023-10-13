@@ -2,13 +2,13 @@ from sqlite3 import Connection
 from typing import Iterable
 from sqlglot.expressions import Table
 
-from .templates import default_environment, identifier
+from .templates import sql_environment, identifier
 
 
 def table_exists(conn: Connection, table: Table) -> bool:
     return (
         conn.execute(
-            default_environment.render(
+            sql_environment.render(
                 """\
                 SELECT 1 FROM {{master}}
                 WHERE type = 'table' AND name = ?""",
@@ -25,7 +25,7 @@ def table_exists(conn: Connection, table: Table) -> bool:
 def column_exists(conn: Connection, table: Table, column: str) -> bool:
     return (
         conn.execute(
-            default_environment.render(
+            sql_environment.render(
                 """\
                 SELECT 1 FROM {% if schema %}{{ schema }}.{% endif %}pragma_table_info(:table)
                 WHERE name = :column""",

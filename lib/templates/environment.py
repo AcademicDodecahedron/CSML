@@ -4,12 +4,12 @@ from jinja2 import Environment, Template
 import textwrap
 
 from .extension import SqltypedExtension
-from .convert import default_converter, Sql
+from .adapter import sql_adapter, Sql
 from .types import Column
 
 
 def _sqltyped_filter(value: Any) -> str:
-    return default_converter.convert(value)
+    return sql_adapter.adapt(value)
 
 
 def _sqljoin_filter(
@@ -20,7 +20,7 @@ def _sqljoin_filter(
     return Sql(
         delimiter.join(
             map(
-                lambda value: default_converter.convert(
+                lambda value: sql_adapter.adapt(
                     getattr(value, attribute) if attribute else value
                 ),
                 values,
@@ -65,4 +65,4 @@ class SqlEnvironment(Environment):
         return self.from_string(source).render(*args, **kwargs)
 
 
-default_environment = SqlEnvironment()
+sql_environment = SqlEnvironment()

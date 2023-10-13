@@ -22,7 +22,7 @@ class Sql(ToSql):
         return self.value
 
 
-class Converter:
+class SqlAdapter:
     def __init__(self, mapping: Optional[dict] = None) -> None:
         self._mapping = mapping or {
             str: lambda value: exp.Literal.string(value).sql(),
@@ -35,7 +35,7 @@ class Converter:
     def register_type(self, type_: type, to_sql: Callable[[Any, JinjaContext], str]):
         self._mapping[type_] = to_sql
 
-    def convert(self, value: Any) -> str:
+    def adapt(self, value: Any) -> str:
         for parent_class in inspect.getmro(type(value)):
             if parent_class in self._mapping:
                 return self._mapping[parent_class](value)
@@ -43,4 +43,4 @@ class Converter:
         raise KeyError("Unsupported type", type(value))
 
 
-default_converter = Converter()
+sql_adapter = SqlAdapter()

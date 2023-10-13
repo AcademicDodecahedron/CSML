@@ -1,13 +1,13 @@
 from sqlite3 import Connection
 from sqlglot.expressions import Table
 
-from lib.templates import default_environment
+from lib.templates import sql_environment
 from lib.checks import table_exists
 from .base import Task
 
 
 class Templates:
-    drop_table = default_environment.from_string("DROP TABLE {{table}};")
+    drop_table = sql_environment.from_string("DROP TABLE {{table}};")
 
 
 class CreateTableSql(Task):
@@ -15,7 +15,7 @@ class CreateTableSql(Task):
         super().__init__()
 
         self._table = table
-        self.scripts["Main"] = self._sql = default_environment.render(
+        self.scripts["Main"] = self._sql = sql_environment.render(
             sql, table=table, **params
         )
         self.scripts["Drop Table"] = self._drop_table = Templates.drop_table.render(

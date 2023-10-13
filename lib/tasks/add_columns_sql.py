@@ -4,6 +4,7 @@ from sqlglot.expressions import Table
 
 from .base import Task
 from lib.templates import Column, SqlEnvironment
+from lib.checks import columns_exist
 
 
 class Templates:
@@ -27,6 +28,7 @@ class AddColumnsSql(Task):
     ) -> None:
         super().__init__()
 
+        self._table = table
         params_joined = {**params, "table": table}
         script_module = SqlEnvironment.default.from_string(sql).make_module(
             params_joined
@@ -37,6 +39,8 @@ class AddColumnsSql(Task):
             columns = getattr(script_module, "columns", None)
             if columns is None:
                 raise ValueError("Columns not specified")
+
+        self._column_names = list(map(lambda col: col.name, columns))
 
         columns_rendered = list(map(lambda col: col.render(**params_joined), columns))
         self.scripts["Add Columns"] = self._add_columns = Templates.add_columns.render(
@@ -50,3 +54,6 @@ class AddColumnsSql(Task):
 
     def delete(self, conn: Connection):
         print("DROP COLUMN is unsupported in sqlite")
+
+    def exists(self, conn: Connection):
+        return columns_exist(conn, self._table, self._column_names)

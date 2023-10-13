@@ -9,17 +9,26 @@ class TaskSequence(Task):
 
     def run(self, conn: Connection):
         for name, task in self._definition:
-            print("Running", name)
+            if task.exists(conn):
+                print(f"Skipping {name}: already done")
+            else:
+                print("Running", name)
 
-            task.run(conn)
-            conn.commit()
+                task.run(conn)
+                conn.commit()
 
     def delete(self, conn: Connection):
         for name, task in reversed(self._definition):
-            print("Deleting", name)
+            if not task.exists(conn):
+                print(f"Skipping {name}: does not exist")
+            else:
+                print("Deleting", name)
 
-            task.delete(conn)
-            conn.commit()
+                task.delete(conn)
+                conn.commit()
+
+    def exists(self, conn: Connection):
+        return False
 
     def describe(self):
         for name, _ in self._definition:

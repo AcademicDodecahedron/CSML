@@ -14,6 +14,10 @@ class Task(ABC):
     def delete(self, conn: Connection):
         pass
 
+    @abstractmethod
+    def exists(self, conn: Connection):
+        pass
+
     def redo(self, conn: Connection):
         self.delete(conn)
         self.run(conn)

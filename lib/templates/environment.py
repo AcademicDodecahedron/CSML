@@ -56,5 +56,8 @@ class SqlEnvironment(Environment):
     ) -> Template:
         return super().from_string(textwrap.dedent(source).strip(), globals)
 
+    def render(self, source: str, *args, **kwargs) -> str:
+        return self.from_string(source).render(*args, **kwargs)
+
 
 SqlEnvironment.default = SqlEnvironment()

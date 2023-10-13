@@ -3,6 +3,7 @@ from typing import Callable, Iterator, Optional
 from sqlglot.expressions import Table
 
 from lib.templates import ValueColumn, ValueColumnRendered, SqlEnvironment, Sql
+from lib.checks import table_exists
 from .base import Task
 from .row_factory import with_dict_factory
 
@@ -43,6 +44,7 @@ class MapToNewTable(Task):
     ) -> None:
         super().__init__()
 
+        self._table = table
         params_merged = {**params, "table": table, "source": source_table}
 
         definitions, insert_columns = [], []
@@ -102,3 +104,6 @@ class MapToNewTable(Task):
 
     def delete(self, conn: Connection):
         conn.execute(self._drop_table)
+
+    def exists(self, conn: Connection):
+        return table_exists(conn, self._table)

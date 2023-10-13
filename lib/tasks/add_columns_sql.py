@@ -5,6 +5,7 @@ from sqlglot.expressions import Table
 from .base import Task
 from lib.templates import Column, sql_environment
 from lib.checks import columns_exist
+from lib.console import console
 
 
 class Templates:
@@ -51,7 +52,7 @@ class AddColumnsSql(Task):
         conn.executescript(self._sql)
 
     def delete(self, conn: Connection):
-        print("DROP COLUMN is unsupported in sqlite")
+        console.log("[red]DROP COLUMN is unsupported in sqlite")
 
     def exists(self, conn: Connection):
         return columns_exist(conn, self._table, self._column_names)

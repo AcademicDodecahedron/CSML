@@ -23,8 +23,6 @@ class Sql(ToSql):
 
 
 class Converter:
-    default: Converter
-
     def __init__(self, mapping: Optional[dict] = None) -> None:
         self._mapping = mapping or {
             str: lambda value: exp.Literal.string(value).sql(),
@@ -45,4 +43,4 @@ class Converter:
         raise KeyError("Unsupported type", type(value))
 
 
-Converter.default = Converter()
+default_converter = Converter()

@@ -3,12 +3,12 @@ from typing import Optional
 from sqlglot.expressions import Table
 
 from .base import Task
-from lib.templates import Column, SqlEnvironment
+from lib.templates import Column, default_environment
 from lib.checks import columns_exist
 
 
 class Templates:
-    add_columns = SqlEnvironment.default.from_string(
+    add_columns = default_environment.from_string(
         """\
         {% set sep = joiner(',\\n    ') -%}
         ALTER TABLE {{ table }}
@@ -30,9 +30,7 @@ class AddColumnsSql(Task):
 
         self._table = table
         params_joined = {**params, "table": table}
-        script_module = SqlEnvironment.default.from_string(sql).make_module(
-            params_joined
-        )
+        script_module = default_environment.from_string(sql).make_module(params_joined)
 
         if columns is None:
             # Get columns variable from template: {% set columns = [...] %}

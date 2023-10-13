@@ -4,7 +4,7 @@ from sqlglot import exp
 from dataclasses import dataclass
 from returns.maybe import Maybe
 
-from .convert import ToSql, Converter
+from .convert import ToSql, default_converter
 
 
 def identifier(name: str) -> exp.Identifier:
@@ -28,11 +28,10 @@ class Column:
         self.type = type
 
     def render(self, **params):
-        from .environment import SqlEnvironment
+        from .environment import default_environment
 
         return ColumnRendered(
-            self.name,
-            SqlEnvironment.default.from_string(self.type).render(**params),
+            self.name, default_environment.render(self.type, **params)
         )
 
 
@@ -58,11 +57,11 @@ class ValueColumn:
         self.value = placeholder(name) if value == _FROM_NAME else value
 
     def render(self, **params):
-        from .environment import SqlEnvironment
+        from .environment import default_environment
 
         return ValueColumnRendered(
             self.name,
-            SqlEnvironment.default.from_string(self.type).render(**params),
+            default_environment.from_string(self.type).render(**params),
             self.value,
         )
 
@@ -88,4 +87,4 @@ class ValueColumnSetStatement(ToSql):
         self._value_column = value_column
 
     def sql(self) -> str:
-        return f"{self._value_column.identifier} = {Converter.default.convert(self._value_column.value)}"
+        return f"{self._value_column.identifier} = {default_converter.convert(self._value_column.value)}"

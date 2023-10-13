@@ -2,21 +2,21 @@ from sqlite3 import Connection
 from typing import Callable, Iterator, Optional
 from sqlglot.expressions import Table
 
-from lib.templates import ValueColumn, ValueColumnRendered, SqlEnvironment, Sql
+from lib.templates import ValueColumn, ValueColumnRendered, default_environment, Sql
 from lib.checks import table_exists
 from .base import Task
 from .row_factory import with_dict_factory
 
 
 class Templates:
-    create_table = SqlEnvironment.default.from_string(
+    create_table = default_environment.from_string(
         """\
         CREATE TABLE {{table}}(
             {{ definitions | sqljoin(',\\n    ') }}
         );
         """
     )
-    insert = SqlEnvironment.default.from_string(
+    insert = default_environment.from_string(
         """\
         {% set sep = joiner(',\\n    ') -%}
         INSERT INTO {{table}}(
@@ -29,7 +29,7 @@ class Templates:
         );
         """
     )
-    drop_table = SqlEnvironment.default.from_string("DROP TABLE {{table}};")
+    drop_table = default_environment.from_string("DROP TABLE {{table}};")
 
 
 class MapToNewTable(Task):
@@ -50,9 +50,7 @@ class MapToNewTable(Task):
         definitions, insert_columns = [], []
         for column in columns:
             if isinstance(column, str):
-                rendered = SqlEnvironment.default.from_string(column).render(
-                    **params_merged
-                )
+                rendered = default_environment.render(column, **params_merged)
 
                 definitions.append(Sql(rendered))
             else:
@@ -66,9 +64,9 @@ class MapToNewTable(Task):
                 definitions.append(rendered.definition())
 
         if select:
-            self.scripts["Select"] = self._select = SqlEnvironment.default.from_string(
-                select
-            ).render(**params_merged)
+            self.scripts["Select"] = self._select = default_environment.render(
+                select, **params_merged
+            )
         else:
             self._select = None
 

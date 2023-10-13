@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from argparse import ArgumentParser
 from sqlglot.expressions import Literal
 
-from lib import TaskTree, TaskIndex, SqlEnvironment
+from lib import TaskTree, TaskIndex, default_environment
 from pipelines import scival, pure, SourceConfig
 
 
@@ -54,7 +54,5 @@ if __name__ == "__main__":
         for script_path in config.export:
             print("Executing ", script_path)
             conn.executescript(
-                SqlEnvironment.default.from_string(script_path.read_text()).render(
-                    slice=0
-                )
+                default_environment.render(script_path.read_text(), slice=0)
             )

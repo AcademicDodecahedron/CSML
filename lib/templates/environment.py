@@ -4,15 +4,15 @@ from jinja2 import Environment, Template
 import textwrap
 
 from .extension import SqltypedExtension
-from .convert import Converter, Sql
+from .convert import default_converter, Sql
 from .types import Column
 
 
-def sqltyped_filter(value: Any) -> str:
-    return Converter.default.convert(value)
+def _sqltyped_filter(value: Any) -> str:
+    return default_converter.convert(value)
 
 
-def sqljoin_filter(
+def _sqljoin_filter(
     values: Iterable[Any],
     delimiter: str,
     attribute: Optional[str] = None,
@@ -20,7 +20,7 @@ def sqljoin_filter(
     return Sql(
         delimiter.join(
             map(
-                lambda value: Converter.default.convert(
+                lambda value: default_converter.convert(
                     getattr(value, attribute) if attribute else value
                 ),
                 values,
@@ -29,13 +29,11 @@ def sqljoin_filter(
     )
 
 
-def sql_filter(value: str) -> Sql:
+def _sql_filter(value: str) -> Sql:
     return Sql(value)
 
 
 class SqlEnvironment(Environment):
-    default: SqlEnvironment
-
     def __init__(self):
         super().__init__()
 
@@ -45,9 +43,9 @@ class SqlEnvironment(Environment):
         self.add_extension(SqltypedExtension)
 
         self.globals["Column"] = Column
-        self.filters["sqltyped"] = sqltyped_filter
-        self.filters["sqljoin"] = sqljoin_filter
-        self.filters["sql"] = sql_filter
+        self.filters["sqltyped"] = _sqltyped_filter
+        self.filters["sqljoin"] = _sqljoin_filter
+        self.filters["sql"] = _sql_filter
 
     def from_string(
         self,
@@ -56,8 +54,15 @@ class SqlEnvironment(Environment):
     ) -> Template:
         return super().from_string(textwrap.dedent(source).strip(), globals)
 
-    def render(self, source: str, *args, **kwargs) -> str:
+    def render(self, *args_all, **kwargs) -> str:
+        if len(args_all) == 0 or not isinstance(args_all[0], str):
+            raise ValueError("First argument must be a string template")
+
+        # Can't have `source` as an argument name,
+        # since that would collide with 'source' being use as a keyword argument name
+        source, args = args_all[0], args_all[1:]
+
         return self.from_string(source).render(*args, **kwargs)
 
 
-SqlEnvironment.default = SqlEnvironment()
+default_environment = SqlEnvironment()

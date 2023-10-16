@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Describe task",
+            "type": "python",
+            "request": "launch",
+            "module": "pipelines.scival",
+            "args": [
+                "-c",
+                "config.yml",
+                "-d",
+                "${input:taskName}",
+                "records.load",
+                "describe"
+            ],
+            "env": {
+                "PYTHONPATH": "__pypackages__/<major.minor>/lib"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "taskName",
+            "type": "promptString",
+            "description": "Task Name"
+        }
+    ]
+}

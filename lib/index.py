@@ -23,15 +23,15 @@ class TaskIndex:
         if len(path) == 0:
             raise ValueError("Path cannot be empty")
 
-        tree = self._definition
+        next = self._definition
         for i, key in enumerate(path[:-1]):
-            next = tree[key]
+            next = next[key]
             if not isinstance(next, dict):
                 raise RuntimeError(
                     f"Cannot resolve path {path}: {path[:i + 1]} has no children"
                 )
 
-        tail = tree[path[-1]]
+        tail = next[path[-1]]
         return (
             tail
             if isinstance(tail, Task)

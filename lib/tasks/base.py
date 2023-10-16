@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 from sqlite3 import Connection
+from rich.syntax import Syntax
+
+from lib.console import console
 
 
 class Task(ABC):
@@ -23,7 +26,9 @@ class Task(ABC):
         self.run(conn)
 
     def describe(self):
-        for name, script in self.scripts.items():
-            print(name)
-            print(script)
-            print()
+        for i, (name, script) in enumerate(self.scripts.items()):
+            console.print(f"[bold]{name}:")
+            console.print(Syntax(script, "sql"))
+
+            if i < len(self.scripts) - 1:
+                console.print()

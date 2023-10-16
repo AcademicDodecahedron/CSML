@@ -1,5 +1,5 @@
 from rich.console import Console
-from rich.traceback import install
+from rich import traceback
 
 console = Console()
-install(console=console)
+traceback.install(console=console)

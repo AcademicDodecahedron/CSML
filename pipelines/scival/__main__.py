@@ -6,7 +6,7 @@ from .config import ScivalConfig
 from .pipeline import create_tasks
 
 cli = TaskRunnerCli()
-cli.add_argument("-c", "--config", type=Path)
+cli.add_argument("-c", "--config", type=Path, required=True, help="YAML config file")
 action, args = cli.parse_args()
 
 with Path(args.config).open() as config_file:

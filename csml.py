@@ -26,8 +26,10 @@ def tasktree_from_config(config: SourceConfig) -> TaskTree:
 
 if __name__ == "__main__":
     argparser = ArgumentParser()
-    argparser.add_argument("-c", "--config", type=Path)
-    argparser.add_argument("output", type=Path)
+    argparser.add_argument("output", type=Path, help="output sqlite database")
+    argparser.add_argument(
+        "-c", "--config", type=Path, required=True, help="YAML config file"
+    )
     args = argparser.parse_args()
 
     with Path(args.config).open() as config_file:

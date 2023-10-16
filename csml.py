@@ -3,10 +3,9 @@ import yaml
 from pathlib import Path
 from pydantic import BaseModel, Field
 from argparse import ArgumentParser
-from sqlglot.expressions import Literal
 from rich.progress import track
 
-from lib import TaskTree, TaskIndex, sql_environment, console
+from lib import TaskTree, TaskIndex, sql_environment, sql_adapter, console
 from pipelines import scival, pure, SourceConfig
 
 
@@ -51,9 +50,7 @@ if __name__ == "__main__":
             console.print(f"Executing [bold cyan]{script_path}")
             conn.executescript(script_path.read_text())
 
-        conn.execute(
-            "ATTACH DATABASE {} AS 'tmp'".format(Literal.string(temp_db).sql())
-        )
+        conn.execute(sql_adapter.format("ATTACH DATABASE {} AS 'tmp'", str(temp_db)))
         for script_path in track(
             config.export, description="Exporting data...", console=console
         ):

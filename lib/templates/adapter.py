@@ -42,5 +42,18 @@ class SqlAdapter:
 
         raise KeyError("Unsupported type", type(value))
 
+    def format(self, *args_all, **kwargs) -> str:
+        if len(args_all) == 0 or not isinstance(args_all[0], str):
+            raise ValueError("First argument must be a string template")
+
+        # Can't have `source` as an argument name,
+        # since that would collide with 'source' being use as a keyword argument name
+        source, args = args_all[0], args_all[1:]
+
+        return source.format(
+            *map(self.adapt, args),
+            **{key: self.adapt(value) for key, value in kwargs.items()},
+        )
+
 
 sql_adapter = SqlAdapter()

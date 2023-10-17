@@ -2,7 +2,7 @@ from csv import DictReader
 from typing import Iterable, TextIO
 from itertools import islice
 
-from pipelines.scival.config import HeaderLength
+from .config import HeaderLength
 
 
 def _find_first_csv_line(file: Iterable[str]):

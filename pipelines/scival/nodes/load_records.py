@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from pipelines.scival.config import HeaderLength
-from .incites_csv import incites_csv_reader
+from ..config import HeaderLength
+from ..incites_csv import incites_csv_reader
 
 
 def load_records_csv(path: Path, header_length: HeaderLength, mapping: dict[str, str]):

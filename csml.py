@@ -1,11 +1,27 @@
 import sqlite3
 import yaml
 from pathlib import Path
+from pydantic import BaseModel, Field
 from argparse import ArgumentParser
 from rich.progress import track
 
-from lib import TaskIndex, sql_environment, sql_adapter, console
-from pipelines import CsmlConfig
+from lib import TaskTree, TaskIndex, sql_environment, sql_adapter, console
+from pipelines import scival, pure, SourceConfig
+
+
+class CsmlConfig(BaseModel):
+    source: SourceConfig
+    sql_schema: list[Path] = Field(alias="schema")
+    export: list[Path]
+
+
+def tasktree_from_config(config: SourceConfig) -> TaskTree:
+    if config.type == "scival":
+        return scival.create_tasks(config)
+    elif config.type == "pure":
+        return pure.create_tasks(config)
+    else:
+        raise RuntimeError("Unknown type " + config.type)
 
 
 if __name__ == "__main__":
@@ -24,7 +40,7 @@ if __name__ == "__main__":
 
     with sqlite3.connect(str(temp_db)) as conn:
         conn.execute("PRAGMA foreign_keys = 1")
-        TaskIndex(config.source.create_tasks()).full_sequence().run(conn)
+        TaskIndex(tasktree_from_config(config.source)).full_sequence().run(conn)
 
     args.output.unlink(True)
     with sqlite3.connect(str(args.output)) as conn:

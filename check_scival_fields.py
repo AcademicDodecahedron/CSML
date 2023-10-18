@@ -3,7 +3,6 @@ import yaml
 from argparse import ArgumentParser
 from pathlib import Path
 from returns.maybe import Maybe
-from rich.pretty import Pretty
 
 from lib.console import console
 from pipelines.scival import ScivalConfig, HeaderLength, incites_csv_reader

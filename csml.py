@@ -21,6 +21,7 @@ if __name__ == "__main__":
     argparser.add_argument(
         "-c", "--config", type=Path, required=True, help="YAML config file"
     )
+    argparser.add_argument("-s", "--slice", type=int, default=0, help="id_slice value")
     argparser.add_argument(
         "--continue",
         action="store_true",
@@ -55,4 +56,6 @@ if __name__ == "__main__":
             config.export, description="Exporting data...", console=console
         ):
             console.print(f"Executing [bold cyan]{script_path}")
-            conn.executescript(sql_environment.render(script_path.read_text(), slice=0))
+            conn.executescript(
+                sql_environment.render(script_path.read_text(), slice=args.slice)
+            )

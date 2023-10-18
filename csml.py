@@ -21,13 +21,20 @@ if __name__ == "__main__":
     argparser.add_argument(
         "-c", "--config", type=Path, required=True, help="YAML config file"
     )
+    argparser.add_argument(
+        "--continue",
+        action="store_true",
+        help="don't clear the temporary database",
+        dest="continue_",  # since `continue` is a reserved keyword
+    )
     args = argparser.parse_args()
 
     with Path(args.config).open() as config_file:
         config = CsmlConfig.model_validate(yaml.safe_load(config_file))
 
     temp_db: Path = args.output.with_stem(args.output.stem + ".tmp")
-    temp_db.unlink(True)
+    if not args.continue_:
+        temp_db.unlink(True)
 
     with sqlite3.connect(str(temp_db)) as conn:
         conn.execute("PRAGMA foreign_keys = 1")

@@ -165,6 +165,7 @@ cython_debug/
 *.sqlite
 *.ju.py
 *.ipynb
+.vscode/
 
 *.yml
 !scival.yml

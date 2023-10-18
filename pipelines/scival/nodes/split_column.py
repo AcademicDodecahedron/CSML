@@ -13,7 +13,7 @@ def split_column(column_name: str):
     return split_column_inner
 
 
-def split_categories(category_mapping: dict[str, int | str]):
+def split_categories(category_mapping: dict[str, int]):
     def split_categories_inner(id_record: int, **kwargs):
         for column_name, category in category_mapping.items():
             header = {

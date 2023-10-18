@@ -13,7 +13,7 @@ class ScivalConfig(BaseModel):
     path: Path
     header_length: HeaderLength
     fields: dict[str, str]
-    category_mapping: dict[str, int | str]
+    category_mapping: dict[str, int]
 
     def create_tasks(self) -> TaskTree:
         return pipeline.create_tasks(self)

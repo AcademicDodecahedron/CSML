@@ -18,5 +18,5 @@ SELECT
     {{ sep() | sql }}{{ column.identifier() }}
     {%- endfor %}
 FROM {{ raw }}
-GROUP BY num_record_raw
+GROUP BY UT
 HAVING MIN(ROWID);

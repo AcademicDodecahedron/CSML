@@ -39,6 +39,7 @@ if __name__ == "__main__":
 
     with sqlite3.connect(str(temp_db)) as conn:
         conn.execute("PRAGMA foreign_keys = 1")
+        conn.execute("BEGIN")
         TaskIndex(config.source.create_tasks()).full_sequence().run(conn)
 
     args.output.unlink(True)

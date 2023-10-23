@@ -24,6 +24,8 @@ def _create_action(
             with sqlite3.connect(db_path) as conn:
                 if foreign_keys:
                     conn.execute("PRAGMA foreign_keys = 1")
+
+                conn.execute("BEGIN")
                 method(conn)
 
         actions: dict[str, Callable[[Task], None]] = {

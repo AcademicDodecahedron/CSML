@@ -8,7 +8,7 @@ from .adapter import Sql, ToSql, sql_adapter
 
 
 def identifier(name: str) -> exp.Identifier:
-    return exp.Identifier(this=name)
+    return exp.Identifier(this=name, quoted=True)
 
 
 def table(name: str, schema: Optional[str] = None) -> exp.Table:

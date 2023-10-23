@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from lib import (
+    TaskTree,
     table,
     identifier,
     MapToNewTable,
@@ -15,7 +16,7 @@ from .nodes.load_records import load_records_csv_or_folder
 from .nodes.split_column import split_column, split_categories
 
 
-def create_tasks(config: ScivalConfig):
+def create_tasks(config: ScivalConfig) -> TaskTree:
     table_records_raw = table("records_raw")
     table_records = table("records")
     table_sources = table("sources")

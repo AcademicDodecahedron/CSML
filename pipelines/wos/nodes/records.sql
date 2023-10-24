@@ -43,7 +43,7 @@ with joined as (
         1 as source_priority,
 
         num_record,
-        DI as doi,
+        NULLIF(DI, '') as doi,
         DT as document_type,
         J9 as source_title,
 
@@ -54,7 +54,7 @@ with joined as (
         C1 as affiliation_c1,
         NR as refs_count,
         TC as cited_from_record,
-        REPLACE(SN, '-', '') as issn, --если поле пустое то EI
+        REPLACE(COALESCE(NULLIF(SN, ''), NULLIF(EI, '')), '-', '') as issn,
         PY as year_publ,
         WC as category_wc,
         WE as category_we,
@@ -66,7 +66,7 @@ with joined as (
         2 as source_priority,
 
         num_record,
-        doi,
+        NULLIF(doi, 'n/a'),
         document_type,
         source as source_title,
 

@@ -44,21 +44,21 @@ with joined as (
 
         num_record,
         NULLIF(DI, '') as doi,
-        DT as document_type,
-        J9 as source_title,
+        NULLIF(DT, '') as document_type,
+        NULLIF(J9, '') as source_title,
 
-        PT as source_type,
-        AU as author_au,
-        AF as author_af,
-        LA as lang_document,
-        C1 as affiliation_c1,
-        NR as refs_count,
-        TC as cited_from_record,
+        NULLIF(PT, '') as source_type,
+        NULLIF(AU, '') as author_au,
+        NULLIF(AF, '') as author_af,
+        NULLIF(LA, '') as lang_document,
+        NULLIF(C1, '') as affiliation_c1,
+        NULLIF(NR, '') as refs_count,
+        NULLIF(TC, '') as cited_from_record,
         REPLACE(COALESCE(NULLIF(SN, ''), NULLIF(EI, '')), '-', '') as issn,
-        PY as year_publ,
-        WC as category_wc,
-        WE as category_we,
-        SC as category_sc
+        NULLIF(PY, '') as year_publ,
+        NULLIF(WC, '') as category_wc,
+        NULLIF(WE, '') as category_we,
+        NULLIF(SC, '') as category_sc
     from {{wos}}
     union
     select

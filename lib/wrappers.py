@@ -1,6 +1,19 @@
+from typing import Callable
+
+
 def with_args(fn, **add_kwargs):
     def wrapper(**kwargs):
         yield from fn(**kwargs, **add_kwargs)
+
+    return wrapper
+
+
+def rename_output(fn, mapping: dict[str, str] | Callable[[str], str]):
+    remap = (lambda key: mapping[key]) if isinstance(mapping, dict) else mapping
+
+    def wrapper(**kwargs):
+        for row in fn(**kwargs):
+            yield {remap(key): value for key, value in row.items()}
 
     return wrapper
 

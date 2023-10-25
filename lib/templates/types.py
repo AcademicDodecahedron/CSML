@@ -90,3 +90,12 @@ class ValueColumnSetStatement(ToSql):
         return sql_adapter.format(
             "{} = {}", self._value_column.identifier(), self._value_column.value
         )
+
+
+class IdColumn(ToSql):
+    def __init__(self, name: str, value: Any = _FROM_NAME) -> None:
+        self.name = name
+        self.value = placeholder(name) if value == _FROM_NAME else value
+
+    def sql(self) -> str:
+        return sql_adapter.format("{} = {}", identifier(self.name), self.value)

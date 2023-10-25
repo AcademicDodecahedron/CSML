@@ -25,3 +25,11 @@ def pop_id_fields(fn, *id_fields: str):
             yield {**id_values, **row}
 
     return wrapper
+
+
+def pop_id_fields_one(fn, *id_fields: str):
+    def wrapper(**kwargs):
+        id_values = {name: kwargs.pop(name) for name in id_fields}
+        return {**id_values, **fn(**kwargs)}
+
+    return wrapper

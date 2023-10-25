@@ -7,14 +7,18 @@ from lib import (
     table,
     rename_output,
     pop_id_fields,
+    pop_id_fields_one,
     MapToNewTable,
     ValueColumn,
     AddColumnsSql,
     Column,
     CreateTableSql,
+    MapToNewColumns,
+    IdColumn,
 )
 from .nodes.loaders import load_files_glob, load_wos, load_incites
 from .nodes.record_authors import split_wos_authors
+from .nodes.rel_affiliations import parse_rel_affiliations, split_address
 from .fields import WOS_COLUMNS, INCITES_COLUMNS, normalize_name
 
 __dir__ = Path(__file__).parent
@@ -34,6 +38,9 @@ def create_tasks(config: WosConfig) -> TaskTree:
     table_incites = table("incites")
     table_records = table("records")
     table_record_authors = table("record_authors")
+    table_rel_affiliations_raw = table("rel_affiliations_raw")
+    table_record_affiliations = table("record_affiliations")
+    table_rel_affiliations = table("rel_affiliations")
 
     return {
         "wos": {
@@ -85,11 +92,62 @@ def create_tasks(config: WosConfig) -> TaskTree:
             FROM {{source}} WHERE author_au IS NOT NULL""",
             table=table_record_authors,
             columns=[
+                "id_record_author INTEGER PRIMARY KEY AUTOINCREMENT",
                 ValueColumn("id_record", "INT REFERENCES {{source}}(id_record)"),
                 ValueColumn("full_name", "TEXT"),
                 ValueColumn("first_name", "TEXT"),
                 ValueColumn("last_name", "TEXT"),
             ],
             fn=pop_id_fields(split_wos_authors, "id_record"),
+        ),
+        "rel_affiliations_raw": MapToNewTable(
+            source_table=table_records,
+            select="""\
+            SELECT id_record, affiliation_c1 AS c1
+            FROM {{source}} WHERE affiliation_c1 IS NOT NULL""",
+            table=table_rel_affiliations_raw,
+            columns=[
+                ValueColumn("id_record", "INT REFERENCES {{source}}(id_record)"),
+                ValueColumn("order", "INT"),
+                ValueColumn("full_address", "TEXT"),
+                ValueColumn("author_name", "TEXT"),
+            ],
+            fn=pop_id_fields(parse_rel_affiliations, "id_record"),
+        ),
+        "record_affiliations": {
+            "create": CreateTableSql(
+                table=table_record_affiliations,
+                sql=__dir__.joinpath("./nodes/record_affiliations.sql").read_text(),
+                params={
+                    "rel_aff": table_rel_affiliations_raw,
+                    "records": table_records,
+                },
+            ),
+            "address": MapToNewColumns(
+                table=table_record_affiliations,
+                select="SELECT id_record_affiliation, full_address AS address FROM {{table}}",
+                columns=[
+                    ValueColumn("org_name", "TEXT"),
+                    ValueColumn("country", "TEXT"),
+                ],
+                fn=pop_id_fields_one(split_address, "id_record_affiliation"),
+                id_fields=[IdColumn("id_record_affiliation")],
+            ),
+            "connect": AddColumnsSql(
+                table=table_rel_affiliations_raw,
+                sql=__dir__.joinpath(
+                    "./nodes/record_affiliations_connect.sql"
+                ).read_text(),
+                params={"record_affiliations": table_record_affiliations},
+            ),
+        },
+        "rel_affiliations": CreateTableSql(
+            table=table_rel_affiliations,
+            sql=__dir__.joinpath("./nodes/rel_affiliations_full.sql").read_text(),
+            params={
+                "raw": table_rel_affiliations_raw,
+                "authors": table_record_authors,
+                "affiliations": table_record_affiliations,
+            },
         ),
     }

@@ -10,7 +10,7 @@ from jinja2.runtime import Context as JinjaContext
 
 class ToSql(ABC):
     @abstractmethod
-    def sql(self, context: JinjaContext) -> str:
+    def sql(self) -> str:
         ...
 
 

@@ -19,6 +19,7 @@ from lib import (
 from .nodes.loaders import load_files_glob, load_wos, load_incites
 from .nodes.record_authors import split_wos_authors
 from .nodes.rel_affiliations import parse_rel_affiliations, split_address
+from .nodes.record_topics import split_topic
 from .fields import WOS_COLUMNS, INCITES_COLUMNS, normalize_name
 
 __dir__ = Path(__file__).parent
@@ -37,6 +38,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
     table_wos = table("wos")
     table_incites = table("incites")
     table_records = table("records")
+    table_record_topics = table("record_topics")
     table_record_authors = table("record_authors")
     table_rel_affiliations_raw = table("rel_affiliations_raw")
     table_record_affiliations = table("record_affiliations")
@@ -82,6 +84,23 @@ def create_tasks(config: WosConfig) -> TaskTree:
             sql=__dir__.joinpath("./nodes/records.sql").read_text(),
             params={"wos": table_wos, "incites": table_incites},
         ),
+        "record_topics": {
+            "create": CreateTableSql(
+                table=table_record_topics,
+                sql=__dir__.joinpath("./nodes/record_topics.sql").read_text(),
+                params={"records": table_records, "incites": table_incites},
+            ),
+            "split": MapToNewColumns(
+                table=table_record_topics,
+                select="SELECT id_record_topic, research_area AS topic FROM {{table}}",
+                columns=[
+                    ValueColumn("num_topics", "TEXT"),
+                    ValueColumn("name_topics", "TEXT"),
+                ],
+                fn=pop_id_fields_one(split_topic, "id_record_topic"),
+                id_fields=[IdColumn("id_record_topic")],
+            ),
+        },
         "record_authors": MapToNewTable(
             source_table=table_records,
             select="""\

@@ -39,6 +39,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
     table_incites = table("incites")
     table_records = table("records")
     table_record_topics = table("record_topics")
+    table_record_metrics = table("record_metrics")
     table_record_authors = table("record_authors")
     table_rel_affiliations_raw = table("rel_affiliations_raw")
     table_record_affiliations = table("record_affiliations")
@@ -101,6 +102,11 @@ def create_tasks(config: WosConfig) -> TaskTree:
                 id_fields=[IdColumn("id_record_topic")],
             ),
         },
+        "record_metrics": CreateTableSql(
+            table=table_record_metrics,
+            sql=__dir__.joinpath("./nodes/record_metrics.sql").read_text(),
+            params={"records": table_records, "incites": table_incites},
+        ),
         "record_authors": MapToNewTable(
             source_table=table_records,
             select="""\

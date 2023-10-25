@@ -20,6 +20,7 @@ from .nodes.loaders import load_files_glob, load_wos, load_incites
 from .nodes.record_authors import split_wos_authors
 from .nodes.rel_affiliations import parse_rel_affiliations, split_address
 from .nodes.record_topics import split_topic
+from .nodes.record_category import split_category
 from .fields import WOS_COLUMNS, INCITES_COLUMNS, normalize_name
 
 __dir__ = Path(__file__).parent
@@ -46,6 +47,8 @@ def create_tasks(config: WosConfig) -> TaskTree:
     table_rel_affiliations = table("rel_affiliations")
 
     table_filename = table("filename_association")
+    table_category_split = table("category_split")
+    table_record_category = table("record_category")
 
     return {
         "wos": {
@@ -188,4 +191,29 @@ def create_tasks(config: WosConfig) -> TaskTree:
                 "affiliations": table_record_affiliations,
             },
         ),
+        "record_category": {
+            "split": MapToNewTable(
+                source_table=table_records,
+                select="SELECT id_record, category_wc, category_sc FROM {{source}}",
+                table=table_category_split,
+                columns=[
+                    ValueColumn("id_record", "INT REFERENCES {{records}}(id_record)"),
+                    ValueColumn("field_name", "TEXT"),
+                    ValueColumn("type_category", "TEXT"),
+                    ValueColumn("value_category", "TEXT"),
+                ],
+                fn=split_category({"category_wc": 3, "category_sc": 4}),
+                params={"records": table_records},
+            ),
+            "combine": CreateTableSql(
+                table=table_record_category,
+                sql=__dir__.joinpath("./nodes/record_category.sql").read_text(),
+                params={
+                    "records": table_records,
+                    "split": table_category_split,
+                    "filename": table_filename,
+                    "affiliations": table_record_affiliations,
+                },
+            ),
+        },
     }

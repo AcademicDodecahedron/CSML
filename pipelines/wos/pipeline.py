@@ -45,6 +45,8 @@ def create_tasks(config: WosConfig) -> TaskTree:
     table_record_affiliations = table("record_affiliations")
     table_rel_affiliations = table("rel_affiliations")
 
+    table_filename = table("filename_association")
+
     return {
         "wos": {
             "load": MapToNewTable(
@@ -80,11 +82,22 @@ def create_tasks(config: WosConfig) -> TaskTree:
                 SET num_record = REPLACE(accession_number, 'WOS:', '')""",
             ),
         },
-        "records": CreateTableSql(
-            table=table_records,
-            sql=__dir__.joinpath("./nodes/records.sql").read_text(),
-            params={"wos": table_wos, "incites": table_incites},
-        ),
+        "records": {
+            "create": CreateTableSql(
+                table=table_records,
+                sql=__dir__.joinpath("./nodes/records.sql").read_text(),
+                params={"wos": table_wos, "incites": table_incites},
+            ),
+            "filename": CreateTableSql(
+                table=table_filename,
+                sql=__dir__.joinpath("./nodes/filename_association.sql").read_text(),
+                params={
+                    "records": table_records,
+                    "wos": table_wos,
+                    "incites": table_incites,
+                },
+            ),
+        },
         "record_topics": {
             "create": CreateTableSql(
                 table=table_record_topics,

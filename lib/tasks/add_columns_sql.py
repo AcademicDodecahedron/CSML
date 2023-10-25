@@ -9,13 +9,11 @@ from lib.console import console
 
 
 class Templates:
-    add_columns = sql_environment.from_string(
+    add_column = sql_environment.from_string(
         """\
-        {% set sep = joiner(',\\n    ') -%}
-        ALTER TABLE {{ table }}
-        {% for column in columns -%}
-        {{ sep() | sql }}ADD COLUMN {{ column.definition() }}
-        {%- endfor %};"""
+        ALTER TABLE {{table}}
+        ADD COLUMN {{ column.definition() }};
+        """
     )
 
 
@@ -39,16 +37,23 @@ class AddColumnsSql(Task):
             if columns is None:
                 raise ValueError("Columns not specified")
 
-        self._column_names = list(map(lambda col: col.name, columns))
-
         columns_rendered = list(map(lambda col: col.render(**params_joined), columns))
-        self.scripts["Add Columns"] = self._add_columns = Templates.add_columns.render(
-            table=table, columns=columns_rendered
+        self._column_names = list(map(lambda col: col.name, columns_rendered))
+
+        self._add_columns = list(
+            map(
+                lambda col: Templates.add_column.render(table=table, column=col),
+                columns_rendered,
+            )
         )
+        self.scripts["Add Columns"] = "\n\n".join(self._add_columns)
+
         self.scripts["Main"] = self._sql = str(script_module)
 
     def run(self, conn: Connection):
-        conn.execute(self._add_columns)
+        for add_column in self._add_columns:
+            conn.execute(add_column)
+
         conn.executescript(self._sql)
 
     def delete(self, conn: Connection):

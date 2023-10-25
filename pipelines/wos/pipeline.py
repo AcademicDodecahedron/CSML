@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Literal, Optional
 from pydantic import BaseModel
+from returns.maybe import Maybe
 
 from lib import (
     TaskTree,
@@ -26,10 +27,14 @@ from .fields import WOS_COLUMNS, INCITES_COLUMNS, normalize_name
 __dir__ = Path(__file__).parent
 
 
+class SourceParams(BaseModel):
+    glob: str
+
+
 class WosConfig(BaseModel):
     type: Literal["wos"]
-    wos_glob: str
-    incites_glob: Optional[str]
+    wos: SourceParams
+    incites: Optional[SourceParams]
 
     def create_tasks(self):
         return create_tasks(self)
@@ -55,7 +60,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
             "load": MapToNewTable(
                 table=table_wos,
                 columns=[ValueColumn("filename", "TEXT"), *WOS_COLUMNS],
-                fn=load_files_glob(config.wos_glob, load_wos),
+                fn=load_files_glob(config.wos.glob, load_wos),
             ),
             "num_record": AddColumnsSql(
                 table=table_wos,
@@ -74,7 +79,13 @@ def create_tasks(config: WosConfig) -> TaskTree:
                     *INCITES_COLUMNS,
                 ],
                 fn=rename_output(
-                    load_files_glob(config.incites_glob, load_incites), normalize_name
+                    load_files_glob(
+                        Maybe.from_optional(config.incites)
+                        .map(lambda incites: incites.glob)
+                        .value_or(None),
+                        load_incites,
+                    ),
+                    normalize_name,
                 ),
             ),
             "num_record": AddColumnsSql(

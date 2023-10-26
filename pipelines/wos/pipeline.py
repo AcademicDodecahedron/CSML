@@ -22,6 +22,7 @@ from .nodes.record_authors import split_wos_authors
 from .nodes.rel_affiliations import parse_rel_affiliations, split_address
 from .nodes.record_topics import split_topic
 from .nodes.record_category import split_category
+from .nodes.database_record import make_database_record
 from .fields import WOS_COLUMNS, INCITES_COLUMNS, normalize_name
 
 __dir__ = Path(__file__).parent
@@ -44,6 +45,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
     table_wos = table("wos")
     table_incites = table("incites")
     table_records = table("records")
+    table_database_record = table("database_record")
     table_record_topics = table("record_topics")
     table_record_metrics = table("record_metrics")
     table_record_authors = table("record_authors")
@@ -112,6 +114,17 @@ def create_tasks(config: WosConfig) -> TaskTree:
                 },
             ),
         },
+        "database_record": MapToNewTable(
+            source_table=table_records,
+            select="SELECT id_record, ut, database_we AS we, database_pm AS pm FROM {{source}}",
+            table=table_database_record,
+            columns=[
+                ValueColumn("id_record", "INT REFERENCES {{source}}(id_record)"),
+                ValueColumn("name_database", "TEXT"),
+                ValueColumn("num_record_in_database", "TEXT"),
+            ],
+            fn=pop_id_fields(make_database_record, "id_record"),
+        ),
         "record_topics": {
             "create": CreateTableSql(
                 table=table_record_topics,

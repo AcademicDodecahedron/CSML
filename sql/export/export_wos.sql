@@ -112,3 +112,14 @@ SELECT
     type_category,
     value_category
 FROM tmp.record_category;
+
+INSERT INTO csml_database_record(
+    id_record,
+    name_database,
+    num_record_in_database
+)
+SELECT
+    id_record,
+    name_database,
+    num_record_in_database
+FROM tmp.database_record;

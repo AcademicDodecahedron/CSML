@@ -86,7 +86,7 @@ with joined as (
         NULL as refs_count,
         NULL as cited_from_record,
         NULL as issn,
-        NULL as year_publ,
+        CAST(publication_date AS INT) as year_publ,
         NULL as category_wc,
         NULL as category_sc,
         NULL as database_we,

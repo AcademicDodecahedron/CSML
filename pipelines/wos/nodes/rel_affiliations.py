@@ -40,7 +40,22 @@ def parse_rel_affiliations(c1: str):
 
 
 def split_address(address: str):
-    org_name = Maybe.from_optional(re.search(r"^([^,]+),", address)).unwrap().group(1)
-    country = Maybe.from_optional(re.search(r",\s*([^,]+)$", address)).unwrap().group(1)
+    parts = re.split(r",\s*", address)
 
-    return {"org_name": org_name, "country": country}
+    org_name = parts[0]
+    country = parts[-1]
+    city_full = parts[-2]
+
+    city = city_full[
+        (
+            Maybe.from_optional(re.search(r"^((\w+-)?[0-9]+\s+)*", city_full))
+            .map(lambda match: match.end(0))
+            .value_or(0)
+        ) : (
+            Maybe.from_optional(re.search(r"(\s+(\w+-)?[0-9]+)*$", city_full))
+            .map(lambda match: match.start(0))
+            .value_or(len(city_full) - 1)
+        )
+    ]
+
+    return {"org_name": org_name, "country": country, "city": city}

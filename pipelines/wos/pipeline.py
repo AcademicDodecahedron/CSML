@@ -194,6 +194,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
                 columns=[
                     ValueColumn("org_name", "TEXT"),
                     ValueColumn("country", "TEXT"),
+                    ValueColumn("city", "TEXT"),
                 ],
                 fn=pop_id_fields_one(split_address, "id_record_affiliation"),
                 id_fields=[IdColumn("id_record_affiliation")],

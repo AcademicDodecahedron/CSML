@@ -3,9 +3,8 @@ import yaml
 from pathlib import Path
 from pydantic import BaseModel, Field
 from argparse import ArgumentParser
-from rich.progress import track
 
-from lib import TaskIndex, sql_environment, sql_adapter, console
+from lib import TaskIndex, sql_environment, sql_adapter, console, track
 from pipelines import SourceConfig
 
 
@@ -46,16 +45,12 @@ if __name__ == "__main__":
     with sqlite3.connect(str(args.output)) as conn:
         conn.execute("PRAGMA foreign_keys = 1")
 
-        for script_path in track(
-            config.sql_schema, description="Preparing schema...", console=console
-        ):
+        for script_path in track(config.sql_schema, description="Preparing schema..."):
             console.print(f"Executing [bold cyan]{script_path}")
             conn.executescript(script_path.read_text())
 
         conn.execute(sql_adapter.format("ATTACH DATABASE {} AS 'tmp'", str(temp_db)))
-        for script_path in track(
-            config.export, description="Exporting data...", console=console
-        ):
+        for script_path in track(config.export, description="Exporting data..."):
             console.print(f"Executing [bold cyan]{script_path}")
             conn.executescript(
                 sql_environment.render(script_path.read_text(), slice=args.slice)

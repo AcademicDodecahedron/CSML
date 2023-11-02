@@ -166,7 +166,7 @@ cython_debug/
 *.ju.py
 *.ipynb
 .vscode/
-console/
+/console/
 
 *.yml
 !scival.yml

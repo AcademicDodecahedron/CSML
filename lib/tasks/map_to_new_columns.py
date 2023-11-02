@@ -3,7 +3,7 @@ from typing_extensions import Callable
 from sqlglot.expressions import Table
 
 from lib.checks import columns_exist
-from lib.console import console
+from lib.console import console, track
 from ..templates import ValueColumn, IdColumn, sql_environment
 from .base import Task
 from .row_factory import with_dict_factory
@@ -67,8 +67,8 @@ class MapToNewColumns(Task):
         for add_column in self._add_columns:
             conn.execute(add_column)
 
-        cursor = conn.cursor(with_dict_factory)
-        for input_row in cursor.execute(self._select):
+        cursor = conn.cursor(with_dict_factory).execute(self._select)
+        for input_row in track(cursor, total=cursor.rowcount):
             output_row = self._fn(**input_row)
             conn.execute(self._update_table, output_row)
 

@@ -1,8 +1,7 @@
 from sqlite3 import Connection
-from rich.progress import track
 
 from .base import Task
-from lib.console import console
+from lib.console import console, track
 
 
 class TaskSequence(Task):
@@ -11,9 +10,7 @@ class TaskSequence(Task):
         self._definition = definition
 
     def run(self, conn: Connection):
-        for name, task in track(
-            self._definition, description="Running tasks...", console=console
-        ):
+        for name, task in track(self._definition, description="Running tasks..."):
             if task.exists(conn):
                 console.print(f"Skipping [bold green]{name}[/bold green]: already done")
             else:
@@ -24,7 +21,7 @@ class TaskSequence(Task):
 
     def delete(self, conn: Connection):
         for name, task in track(
-            reversed(self._definition), description="Undoing tasks...", console=console
+            reversed(self._definition), description="Undoing tasks..."
         ):
             if not task.exists(conn):
                 console.print(

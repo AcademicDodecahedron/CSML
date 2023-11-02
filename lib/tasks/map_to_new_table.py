@@ -4,6 +4,7 @@ from sqlglot.expressions import Table
 
 from lib.templates import ValueColumn, ValueColumnRendered, sql_environment, Sql
 from lib.checks import table_exists
+from lib.console import track
 from .base import Task
 from .row_factory import with_dict_factory
 
@@ -94,8 +95,8 @@ class MapToNewTable(Task):
                 conn.execute(self._insert, output_row)
 
         if self._select:
-            cursor = conn.cursor(with_dict_factory)
-            for input_row in cursor.execute(self._select):
+            cursor = conn.cursor(with_dict_factory).execute(self._select)
+            for input_row in track(cursor, total=cursor.rowcount):
                 process_input(**input_row)
         else:
             process_input()

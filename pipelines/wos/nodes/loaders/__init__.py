@@ -2,7 +2,7 @@ from pathlib import Path
 import glob
 from typing import Callable, Iterable, Optional
 
-from lib import console
+from lib import console, track
 
 from .wos import *
 from .incites import *
@@ -13,7 +13,8 @@ def load_files_glob(pattern: Optional[str], fn: Callable[[Path], Iterable[dict]]
         if not pattern:
             return
 
-        for file_path in map(Path, glob.iglob(pattern, recursive=True)):
+        paths = list(map(Path, glob.iglob(pattern, recursive=True)))
+        for file_path in track(paths, description="Reading..."):
             console.log("Reading", file_path)
             filename = file_path.name
 

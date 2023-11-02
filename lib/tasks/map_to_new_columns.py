@@ -68,7 +68,9 @@ class MapToNewColumns(Task):
             conn.execute(add_column)
 
         cursor = conn.cursor(with_dict_factory).execute(self._select)
-        for input_row in track(cursor, total=cursor.rowcount):
+        for input_row in track(
+            cursor, description="Task progress...", total=cursor.rowcount
+        ):
             output_row = self._fn(**input_row)
             conn.execute(self._update_table, output_row)
 

@@ -7,7 +7,7 @@ from .console import console
 
 T = TypeVar("T")
 
-PROGRESS = Progress(console=console)
+PROGRESS = Progress(console=console, transient=True)
 
 
 def track(

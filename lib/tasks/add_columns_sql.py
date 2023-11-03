@@ -1,4 +1,4 @@
-from sqlite3 import Connection
+from sqlite3 import Connection, OperationalError
 from typing import Optional
 from sqlglot.expressions import Table
 
@@ -13,6 +13,12 @@ class Templates:
         """\
         ALTER TABLE {{table}}
         ADD COLUMN {{ column.definition() }};
+        """
+    )
+    drop_column = sql_environment.from_string(
+        """\
+        ALTER TABLE {{table}}
+        DROP COLUMN {{ column.identifier() }};
         """
     )
 
@@ -46,7 +52,14 @@ class AddColumnsSql(Task):
                 columns_rendered,
             )
         )
+        self._drop_columns = list(
+            map(
+                lambda col: Templates.drop_column.render(table=table, column=col),
+                columns_rendered,
+            )
+        )
         self.scripts["Add Columns"] = "\n\n".join(self._add_columns)
+        self.scripts["Drop Columns"] = "\n\n".join(self._drop_columns)
 
         self.scripts["Main"] = self._sql = str(script_module)
 
@@ -57,7 +70,12 @@ class AddColumnsSql(Task):
         conn.executescript(self._sql)
 
     def delete(self, conn: Connection):
-        console.log("[red]DROP COLUMN is unsupported in sqlite")
+        try:
+            for drop_column in self._drop_columns:
+                conn.execute(drop_column)
+        except OperationalError as err:
+            # DROP COLUMN may not be supported in all sqlite versions
+            console.log(err)
 
     def exists(self, conn: Connection):
         return columns_exist(conn, self._table, self._column_names)

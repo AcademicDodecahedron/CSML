@@ -1,10 +1,12 @@
 from sqlite3 import Connection, OperationalError
+from typing import Optional
 from typing_extensions import Callable
+from returns.maybe import Maybe
 from sqlglot.expressions import Table
 
 from lib.checks import columns_exist
 from lib.console import console, track
-from ..templates import ValueColumn, IdColumn, sql_environment
+from ..templates import ValueColumn, IdColumn, sql_environment, identifier
 from .base import Task
 from .row_factory import with_dict_factory
 
@@ -43,13 +45,25 @@ class MapToNewColumns(Task):
         columns: list[ValueColumn],
         fn: Callable[..., dict],
         id_fields: list[IdColumn],
+        is_done_column: Optional[str] = None,
         params: dict = {},
     ) -> None:
         super().__init__()
 
         self._fn = fn
         self._table = table
-        params_merged = {**params, "table": table}
+
+        if is_done_column:
+            columns.append(ValueColumn(is_done_column, "BOOL DEFAULT FALSE", True))
+        self._commit_each = bool(is_done_column)
+
+        params_merged = {
+            **params,
+            "table": table,
+            "is_done": Maybe.from_optional(is_done_column)
+            .map(identifier)
+            .value_or(None),
+        }
 
         columns_rendered = list(map(lambda col: col.render(**params_merged), columns))
         self._column_names = list(map(lambda col: col.name, columns_rendered))
@@ -78,14 +92,20 @@ class MapToNewColumns(Task):
 
     def run(self, conn: Connection):
         for add_column in self._add_columns:
-            conn.execute(add_column)
+            try:
+                conn.execute(add_column)
+            except OperationalError:
+                pass
 
-        cursor = conn.cursor(with_dict_factory).execute(self._select)
+        cursor = conn.cursor(with_dict_factory)
         for input_row in track(
-            cursor, description="Task progress...", total=cursor.rowcount
+            cursor.execute(self._select).fetchall(), description="Task progress..."
         ):
             output_row = self._fn(**input_row)
             conn.execute(self._update_table, output_row)
+
+            if self._commit_each:
+                conn.commit()
 
     def delete(self, conn: Connection):
         try:
@@ -96,4 +116,8 @@ class MapToNewColumns(Task):
             console.log(err)
 
     def exists(self, conn: Connection):
-        return columns_exist(conn, self._table, self._column_names)
+        return columns_exist(conn, self._table, self._column_names) and (
+            not self._commit_each
+            # If this is a resumable task, check if inputs are empty
+            or conn.execute(self._select).fetchone() is None
+        )

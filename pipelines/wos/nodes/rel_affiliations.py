@@ -39,23 +39,23 @@ def parse_rel_affiliations(c1: str):
             }
 
 
+def extract_city(parts: list[str]):
+    city_long = parts[-2]
+    words = city_long.split()
+
+    city, index = [], []
+    for word in words:
+        (index if re.search(r"\d", word) else city).append(word)
+
+    return " ".join(city), " ".join(index)
+
+
 def split_address(address: str):
     parts = re.split(r",\s*", address)
 
     org_name = parts[0]
     country = parts[-1]
-    city_full = parts[-2]
 
-    city = city_full[
-        (
-            Maybe.from_optional(re.search(r"^((\w+-)?[0-9]+\s+)*", city_full))
-            .map(lambda match: match.end(0))
-            .value_or(0)
-        ) : (
-            Maybe.from_optional(re.search(r"(\s+(\w+-)?[0-9]+)*$", city_full))
-            .map(lambda match: match.start(0))
-            .value_or(len(city_full) - 1)
-        )
-    ]
+    city, index = extract_city(parts)
 
-    return {"org_name": org_name, "country": country, "city": city}
+    return {"org_name": org_name, "country": country, "city": city, "index": index}

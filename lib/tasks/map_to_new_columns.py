@@ -44,7 +44,7 @@ class MapToNewColumns(Task):
         table: Table,
         columns: list[ValueColumn],
         fn: Callable[..., dict],
-        id_fields: list[IdColumn],
+        id_fields: Optional[list[IdColumn]] = None,
         is_done_column: Optional[str] = None,
         params: dict = {},
     ) -> None:
@@ -67,6 +67,14 @@ class MapToNewColumns(Task):
 
         columns_rendered = list(map(lambda col: col.render(**params_merged), columns))
         self._column_names = list(map(lambda col: col.name, columns_rendered))
+
+        if id_fields is None:
+            id_field_names = getattr(fn, "id_fields", None)
+            assert (
+                id_field_names
+            ), "Couldn't infer id_fields for mapping function, please provide explicitly"
+
+            id_fields = list(map(IdColumn, id_field_names))
 
         self._add_columns = list(
             map(

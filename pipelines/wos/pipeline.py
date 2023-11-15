@@ -127,7 +127,6 @@ def create_tasks(config: WosConfig) -> TaskTree:
                     ValueColumn("name_topics", "TEXT"),
                 ],
                 fn=compose_one(split_topic, pop_id_fields("id_record_topic")),
-                id_fields=[IdColumn("id_record_topic")],
             ),
         },
         "record_metrics": CreateTableSql(
@@ -190,7 +189,6 @@ def create_tasks(config: WosConfig) -> TaskTree:
                     add_to_input(config=config.address),
                     pop_id_fields("id_record_affiliation"),
                 ),
-                id_fields=[IdColumn("id_record_affiliation")],
             ),
             "connect": AddColumnsSql(
                 table=table_rel_affiliations_raw,

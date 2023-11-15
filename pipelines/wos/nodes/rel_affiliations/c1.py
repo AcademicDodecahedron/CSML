@@ -1,6 +1,4 @@
-import re
 from typing import Iterable, Optional
-from returns.maybe import Maybe
 
 
 def _split_c1(c1: str) -> Iterable[tuple[Optional[str], str]]:
@@ -37,25 +35,3 @@ def parse_rel_affiliations(c1: str):
                 "full_address": address,
                 "order": order + 1,
             }
-
-
-def extract_city(parts: list[str]):
-    city_long = parts[-2]
-    words = city_long.split()
-
-    city, index = [], []
-    for word in words:
-        (index if re.search(r"\d", word) else city).append(word)
-
-    return " ".join(city), " ".join(index)
-
-
-def split_address(address: str):
-    parts = re.split(r",\s*", address)
-
-    org_name = parts[0]
-    country = parts[-1]
-
-    city, index = extract_city(parts)
-
-    return {"org_name": org_name, "country": country, "city": city, "index": index}

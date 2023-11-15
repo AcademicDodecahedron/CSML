@@ -9,6 +9,7 @@ from lib import (
     rename_output,
     pop_id_fields,
     pop_id_fields_one,
+    with_args_one,
     MapToNewTable,
     ValueColumn,
     AddColumnsSql,
@@ -24,21 +25,9 @@ from .nodes.record_topics import split_topic
 from .nodes.record_category import split_category
 from .nodes.database_record import make_database_record
 from .fields import WOS_COLUMNS, INCITES_COLUMNS, normalize_name
+from .config import WosConfig
 
 __dir__ = Path(__file__).parent
-
-
-class SourceParams(BaseModel):
-    glob: str
-
-
-class WosConfig(BaseModel):
-    type: Literal["wos"]
-    wos: SourceParams
-    incites: Optional[SourceParams]
-
-    def create_tasks(self):
-        return create_tasks(self)
 
 
 def create_tasks(config: WosConfig) -> TaskTree:
@@ -197,7 +186,10 @@ def create_tasks(config: WosConfig) -> TaskTree:
                     ValueColumn("city", "TEXT"),
                     ValueColumn("index", "TEXT"),
                 ],
-                fn=pop_id_fields_one(split_address, "id_record_affiliation"),
+                fn=pop_id_fields_one(
+                    with_args_one(split_address, config=config.address),
+                    "id_record_affiliation",
+                ),
                 id_fields=[IdColumn("id_record_affiliation")],
             ),
             "connect": AddColumnsSql(

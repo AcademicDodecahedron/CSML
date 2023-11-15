@@ -8,6 +8,13 @@ def with_args(fn, **add_kwargs):
     return wrapper
 
 
+def with_args_one(fn, **add_kwargs):
+    def wrapper(**kwargs):
+        return fn(**kwargs, **add_kwargs)
+
+    return wrapper
+
+
 def rename_output(fn, mapping: dict[str, str] | Callable[[str], str]):
     remap = (lambda key: mapping[key]) if isinstance(mapping, dict) else mapping
 

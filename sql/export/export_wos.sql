@@ -82,13 +82,17 @@ INSERT INTO csml_record_affiliation(
     id_record_affiliation,
     id_record,
     full_address,
-    country
+    country,
+    city,
+    zip
 )
 SELECT
     id_record_affiliation,
     id_record,
     full_address,
-    country
+    country,
+    city,
+    "index"
 FROM tmp.record_affiliations;
 
 INSERT INTO csml_record_author_rel_affiliation(

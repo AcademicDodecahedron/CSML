@@ -72,7 +72,7 @@ class MapToNewColumns(Task):
             id_field_names = getattr(fn, "id_fields", None)
             assert (
                 id_field_names
-            ), "Couldn't infer id_fields for mapping function, please provide explicitly"
+            ), "Couldn't infer id_fields from mapping function, please provide explicitly"
 
             id_fields = list(map(IdColumn, id_field_names))
 

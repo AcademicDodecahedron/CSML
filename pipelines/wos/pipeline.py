@@ -1,15 +1,14 @@
 from pathlib import Path
-from typing import Literal, Optional
-from pydantic import BaseModel
 from returns.maybe import Maybe
 
 from lib import (
     TaskTree,
     table,
+    compose,
+    compose_one,
     rename_output,
     pop_id_fields,
-    pop_id_fields_one,
-    with_args_one,
+    add_to_input,
     MapToNewTable,
     ValueColumn,
     AddColumnsSql,
@@ -69,14 +68,14 @@ def create_tasks(config: WosConfig) -> TaskTree:
                     ValueColumn("footer__schema", "TEXT"),
                     *INCITES_COLUMNS,
                 ],
-                fn=rename_output(
+                fn=compose(
                     load_files_glob(
                         Maybe.from_optional(config.incites)
                         .map(lambda incites: incites.glob)
                         .value_or(None),
                         load_incites,
                     ),
-                    normalize_name,
+                    rename_output(normalize_name),
                 ),
             ),
             "num_record": AddColumnsSql(
@@ -112,7 +111,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
                 ValueColumn("name_database", "TEXT"),
                 ValueColumn("num_record_in_database", "TEXT"),
             ],
-            fn=pop_id_fields(make_database_record, "id_record"),
+            fn=compose(make_database_record, pop_id_fields("id_record")),
         ),
         "record_topics": {
             "create": CreateTableSql(
@@ -127,7 +126,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
                     ValueColumn("num_topics", "TEXT"),
                     ValueColumn("name_topics", "TEXT"),
                 ],
-                fn=pop_id_fields_one(split_topic, "id_record_topic"),
+                fn=compose_one(split_topic, pop_id_fields("id_record_topic")),
                 id_fields=[IdColumn("id_record_topic")],
             ),
         },
@@ -152,7 +151,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
                 ValueColumn("first_name", "TEXT"),
                 ValueColumn("last_name", "TEXT"),
             ],
-            fn=pop_id_fields(split_wos_authors, "id_record"),
+            fn=compose(split_wos_authors, pop_id_fields("id_record")),
         ),
         "rel_affiliations_raw": MapToNewTable(
             source_table=table_records,
@@ -166,7 +165,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
                 ValueColumn("full_address", "TEXT"),
                 ValueColumn("author_name", "TEXT"),
             ],
-            fn=pop_id_fields(parse_rel_affiliations, "id_record"),
+            fn=compose(parse_rel_affiliations, pop_id_fields("id_record")),
         ),
         "record_affiliations": {
             "create": CreateTableSql(
@@ -186,9 +185,10 @@ def create_tasks(config: WosConfig) -> TaskTree:
                     ValueColumn("city", "TEXT"),
                     ValueColumn("index", "TEXT"),
                 ],
-                fn=pop_id_fields_one(
-                    with_args_one(split_address, config=config.address),
-                    "id_record_affiliation",
+                fn=compose_one(
+                    split_address,
+                    add_to_input(config=config.address),
+                    pop_id_fields("id_record_affiliation"),
                 ),
                 id_fields=[IdColumn("id_record_affiliation")],
             ),

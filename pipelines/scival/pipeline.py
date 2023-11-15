@@ -9,7 +9,8 @@ from lib import (
     AddColumnsSql,
     ValueColumn,
     Column,
-    with_args,
+    compose,
+    add_to_input,
 )
 from .config import ScivalConfig
 from .nodes.load_records import load_records_csv_or_folder
@@ -42,11 +43,13 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
                     ValueColumn("filename", "TEXT"),
                     *record_columns,
                 ],
-                fn=with_args(
+                fn=compose(
                     load_records_csv_or_folder,
-                    path=config.path,
-                    header_length=config.header_length,
-                    mapping=config.fields,
+                    add_to_input(
+                        path=config.path,
+                        header_length=config.header_length,
+                        mapping=config.fields,
+                    ),
                 ),
             ),
             "dedupe": CreateTableSql(

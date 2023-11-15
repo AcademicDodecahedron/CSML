@@ -5,8 +5,6 @@ from typing import Any, Callable, Optional
 from sqlglot import exp
 import inspect
 
-from jinja2.runtime import Context as JinjaContext
-
 
 class ToSql(ABC):
     @abstractmethod
@@ -32,7 +30,7 @@ class SqlAdapter:
             ToSql: lambda value: value.sql(),
         }
 
-    def register_type(self, type_: type, to_sql: Callable[[Any, JinjaContext], str]):
+    def register_type(self, type_: type, to_sql: Callable[[Any], str]):
         self._mapping[type_] = to_sql
 
     def adapt(self, value: Any) -> str:

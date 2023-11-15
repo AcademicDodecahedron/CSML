@@ -41,7 +41,9 @@ def pop_id_fields(*id_fields: str, keep: bool = False):
                 yield {**row, **id_values}
 
         # Save metadata on which fields are considered identifiers (useful for SQL generation)
-        getattr(wrapper, "id_fields", []).extend(id_fields)
+        metadata = getattr(wrapper, "id_fields", [])
+        metadata.extend(id_fields)
+        setattr(wrapper, "id_fields", metadata)
 
         return wrapper
 

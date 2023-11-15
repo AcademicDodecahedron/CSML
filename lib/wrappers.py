@@ -112,16 +112,3 @@ def compose_one(
     fn: OneToOne, *decorators: Callable[[OneToMany], OneToMany]
 ) -> OneToOne:
     return into_one(compose(into_many(fn), *decorators))
-
-
-def meow(name: str):
-    yield {"ff": "moo"}
-    yield {"ff": name}
-
-
-def moo(name: str):
-    return {"ff": "moo"}
-
-
-meow1 = compose(meow, pop_id_fields("id"), rename_output({"ff": "foo"}))
-moo1 = compose_one(moo, pop_id_fields("id"), rename_output({"ff": "foo"}))

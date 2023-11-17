@@ -22,12 +22,12 @@ class Column(ColumnBase[Template]):
         super().__init__(name, sql_environment.from_string(type))
 
     def render(self, **params) -> ColumnRendered:
-        return ColumnRendered(self.name, Sql(self.type.render(**params)))
+        return ColumnRendered(self.name, self.type.render(**params))
 
 
 class ColumnRendered(ColumnBase[Sql]):
-    def __init__(self, name: str, type: Sql) -> None:
-        super().__init__(name, type)
+    def __init__(self, name: str, type: str) -> None:
+        super().__init__(name, Sql(type))
 
     def identifier(self) -> exp.Identifier:
         return identifier(self.name)

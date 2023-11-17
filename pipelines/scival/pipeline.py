@@ -2,7 +2,6 @@ from lib import (
     TaskTree,
     table,
     identifier,
-    Sql,
     MapToNewTable,
     CreateTableSql,
     AddColumnsSql,
@@ -31,7 +30,7 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
     table_record_metrics = table("record_metrics")
 
     record_columns = list(
-        map(lambda name: ValueColumnRendered(name, Sql("TEXT")), config.fields.values())
+        map(lambda name: ValueColumnRendered(name, "TEXT"), config.fields.values())
     )
 
     return {

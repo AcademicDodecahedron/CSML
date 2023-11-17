@@ -3,7 +3,7 @@ from typing import Any
 
 from .primitives import identifier, placeholder
 from .column import Column, ColumnRendered
-from ..adapter import Sql, ToSql, sql_adapter
+from ..adapter import ToSql, sql_adapter
 
 
 FROM_NAME = object()
@@ -19,13 +19,11 @@ class ValueColumn(Column):
         self.value = infer_value(name, value)
 
     def render(self, **params) -> ValueColumnRendered:
-        return ValueColumnRendered(
-            self.name, Sql(self.type.render(**params)), self.value
-        )
+        return ValueColumnRendered(self.name, self.type.render(**params), self.value)
 
 
 class ValueColumnRendered(ColumnRendered):
-    def __init__(self, name: str, type: Sql, value: Any = FROM_NAME) -> None:
+    def __init__(self, name: str, type: str, value: Any = FROM_NAME) -> None:
         super().__init__(name, type)
         self.value = infer_value(name, value)
 

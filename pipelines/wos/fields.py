@@ -1,5 +1,5 @@
 import re
-from lib import ValueColumnRendered, Sql
+from lib import ValueColumnRendered
 
 
 def normalize_name(name: str) -> str:
@@ -8,7 +8,7 @@ def normalize_name(name: str) -> str:
 
 WOS_COLUMNS = list(
     map(
-        lambda name: ValueColumnRendered(name, Sql("TEXT")),
+        lambda name: ValueColumnRendered(name, "TEXT"),
         [
             # fmt: off
             "PT", "AU", "BA", "BE", "GP", "AF", "BF", "CA", "TI", "SO", "SE", "BS", "LA",
@@ -24,7 +24,7 @@ WOS_COLUMNS = list(
 
 INCITES_COLUMNS = list(
     map(
-        lambda name: ValueColumnRendered(normalize_name(name), Sql("TEXT")),
+        lambda name: ValueColumnRendered(normalize_name(name), "TEXT"),
         [
             "Accession Number",
             "DOI",

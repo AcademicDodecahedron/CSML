@@ -1,5 +1,5 @@
 import re
-from lib import ValueColumn
+from lib import ValueColumnRendered, Sql
 
 
 def normalize_name(name: str) -> str:
@@ -8,86 +8,23 @@ def normalize_name(name: str) -> str:
 
 WOS_COLUMNS = list(
     map(
-        ValueColumn.render,
+        lambda name: ValueColumnRendered(name, Sql("TEXT")),
         [
-            ValueColumn("PT", "TEXT"),
-            ValueColumn("AU", "TEXT"),
-            ValueColumn("BA", "TEXT"),
-            ValueColumn("BE", "TEXT"),
-            ValueColumn("GP", "TEXT"),
-            ValueColumn("AF", "TEXT"),
-            ValueColumn("BF", "TEXT"),
-            ValueColumn("CA", "TEXT"),
-            ValueColumn("TI", "TEXT"),
-            ValueColumn("SO", "TEXT"),
-            ValueColumn("SE", "TEXT"),
-            ValueColumn("BS", "TEXT"),
-            ValueColumn("LA", "TEXT"),
-            ValueColumn("DT", "TEXT"),
-            ValueColumn("CT", "TEXT"),
-            ValueColumn("CY", "TEXT"),
-            ValueColumn("CL", "TEXT"),
-            ValueColumn("SP", "TEXT"),
-            ValueColumn("HO", "TEXT"),
-            ValueColumn("DE", "TEXT"),
-            ValueColumn("ID", "TEXT"),
-            ValueColumn("AB", "TEXT"),
-            ValueColumn("C1", "TEXT"),
-            ValueColumn("C3", "TEXT"),
-            ValueColumn("RP", "TEXT"),
-            ValueColumn("EM", "TEXT"),
-            ValueColumn("RI", "TEXT"),
-            ValueColumn("OI", "TEXT"),
-            ValueColumn("FU", "TEXT"),
-            ValueColumn("FP", "TEXT"),
-            ValueColumn("FX", "TEXT"),
-            ValueColumn("CR", "TEXT"),
-            ValueColumn("NR", "TEXT"),
-            ValueColumn("TC", "TEXT"),
-            ValueColumn("Z9", "TEXT"),
-            ValueColumn("U1", "TEXT"),
-            ValueColumn("U2", "TEXT"),
-            ValueColumn("PU", "TEXT"),
-            ValueColumn("PI", "TEXT"),
-            ValueColumn("PA", "TEXT"),
-            ValueColumn("SN", "TEXT"),
-            ValueColumn("EI", "TEXT"),
-            ValueColumn("BN", "TEXT"),
-            ValueColumn("J9", "TEXT"),
-            ValueColumn("JI", "TEXT"),
-            ValueColumn("PD", "TEXT"),
-            ValueColumn("PY", "TEXT"),
-            ValueColumn("VL", "TEXT"),
-            ValueColumn("IS", "TEXT"),
-            ValueColumn("PN", "TEXT"),
-            ValueColumn("SU", "TEXT"),
-            ValueColumn("SI", "TEXT"),
-            ValueColumn("MA", "TEXT"),
-            ValueColumn("BP", "TEXT"),
-            ValueColumn("EP", "TEXT"),
-            ValueColumn("AR", "TEXT"),
-            ValueColumn("DI", "TEXT"),
-            ValueColumn("DL", "TEXT"),
-            ValueColumn("D2", "TEXT"),
-            ValueColumn("EA", "TEXT"),
-            ValueColumn("PG", "TEXT"),
-            ValueColumn("WC", "TEXT"),
-            ValueColumn("WE", "TEXT"),
-            ValueColumn("SC", "TEXT"),
-            ValueColumn("GA", "TEXT"),
-            ValueColumn("PM", "TEXT"),
-            ValueColumn("OA", "TEXT"),
-            ValueColumn("HC", "TEXT"),
-            ValueColumn("HP", "TEXT"),
-            ValueColumn("DA", "TEXT"),
-            ValueColumn("UT", "TEXT"),
+            # fmt: off
+            "PT", "AU", "BA", "BE", "GP", "AF", "BF", "CA", "TI", "SO", "SE", "BS", "LA",
+            "DT", "CT", "CY", "CL", "SP", "HO", "DE", "ID", "AB", "C1", "C3", "RP", "EM",
+            "RI", "OI", "FU", "FP", "FX", "CR", "NR", "TC", "Z9", "U1", "U2", "PU", "PI",
+            "PA", "SN", "EI", "BN", "J9", "JI", "PD", "PY", "VL", "IS", "PN", "SU", "SI",
+            "MA", "BP", "EP", "AR", "DI", "DL", "D2", "EA", "PG", "WC", "WE", "SC", "GA",
+            "PM", "OA", "HC", "HP", "DA", "UT"
+            # fmt: on
         ],
     )
 )
 
 INCITES_COLUMNS = list(
     map(
-        lambda name: ValueColumn(normalize_name(name), "TEXT").render(),
+        lambda name: ValueColumnRendered(normalize_name(name), Sql("TEXT")),
         [
             "Accession Number",
             "DOI",

@@ -6,7 +6,14 @@ from sqlglot.expressions import Table
 
 from lib.checks import columns_exist
 from lib.console import console, track
-from ..templates import ValueColumn, IdColumn, sql_environment, identifier
+from ..templates import (
+    Renderable,
+    ValueColumn,
+    ValueColumnRendered,
+    IdColumn,
+    sql_environment,
+    identifier,
+)
 from .base import Task
 from .row_factory import with_dict_factory
 
@@ -42,7 +49,7 @@ class MapToNewColumns(Task):
         self,
         select: str,
         table: Table,
-        columns: list[ValueColumn],
+        columns: list[Renderable[ValueColumnRendered]],
         fn: Callable[..., dict],
         id_fields: Optional[list[IdColumn]] = None,
         is_done_column: Optional[str] = None,

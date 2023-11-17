@@ -15,7 +15,6 @@ from lib import (
     Column,
     CreateTableSql,
     MapToNewColumns,
-    IdColumn,
 )
 from .nodes.loaders import load_files_glob, load_wos, load_incites
 from .nodes.record_authors import split_wos_authors

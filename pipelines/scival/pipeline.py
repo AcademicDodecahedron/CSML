@@ -4,10 +4,12 @@ from lib import (
     TaskTree,
     table,
     identifier,
+    Sql,
     MapToNewTable,
     CreateTableSql,
     AddColumnsSql,
     ValueColumn,
+    ValueColumnRendered,
     Column,
     compose,
     add_to_input,
@@ -29,9 +31,9 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
     table_record_topics = table("record_topics")
     table_record_metrics = table("record_metrics")
 
-    record_columns = [
-        *map(lambda name: ValueColumn(name, "TEXT").render(), config.fields.values()),
-    ]
+    record_columns = list(
+        map(lambda name: ValueColumnRendered(name, Sql("TEXT")), config.fields.values())
+    )
 
     parent_folder = Path(__file__).parent
 

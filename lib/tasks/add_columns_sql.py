@@ -3,7 +3,7 @@ from typing import Optional
 from sqlglot.expressions import Table
 
 from .base import Task
-from lib.templates import Column, sql_environment
+from lib.templates import Renderable, ColumnRendered, sql_environment
 from lib.checks import columns_exist
 from lib.console import console
 
@@ -28,7 +28,7 @@ class AddColumnsSql(Task):
         self,
         sql: str,
         table: Table,
-        columns: Optional[list[Column]] = None,
+        columns: Optional[list[Renderable[ColumnRendered]]] = None,
         params: dict = {},
     ) -> None:
         super().__init__()

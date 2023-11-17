@@ -16,7 +16,8 @@ from lib import (
     MapToNewColumns,
 )
 from lib.utils import folder
-from .nodes.loaders import load_files_glob, load_wos, load_incites
+from pipelines.glob import load_files_glob
+from .nodes.loaders import load_wos, load_incites
 from .nodes.record_authors import split_wos_authors
 from .nodes.rel_affiliations import parse_rel_affiliations, split_address
 from .nodes.record_topics import split_topic

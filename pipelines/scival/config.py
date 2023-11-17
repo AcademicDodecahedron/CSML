@@ -9,7 +9,7 @@ HeaderLength = int | Literal["auto"]
 
 class ScivalConfig(BaseModel):
     type: Literal["scival"]
-    path: Path
+    glob: str
     header_length: HeaderLength
     fields: dict[str, str]
     category_mapping: dict[str, int]

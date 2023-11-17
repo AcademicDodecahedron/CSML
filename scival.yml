@@ -1,6 +1,6 @@
 source:
   type: scival
-  path: ../scival_kedro/страны
+  glob: ../scival_kedro/страны/*.csv
   header_length: 19
   fields:
     Outputs in Top Citation Percentiles, per percentile: outputs_in_top_citation_percentiles_per_percentile

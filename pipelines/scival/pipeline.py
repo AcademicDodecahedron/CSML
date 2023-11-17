@@ -12,8 +12,9 @@ from lib import (
     add_to_input,
 )
 from lib.utils import folder
+from pipelines.glob import load_files_glob
 from .config import ScivalConfig
-from .nodes.load_records import load_records_csv_or_folder
+from .nodes.load_records import load_records_csv
 from .nodes.split_column import split_column, split_categories
 
 
@@ -41,12 +42,14 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
                     ValueColumn("filename", "TEXT"),
                     *record_columns,
                 ],
-                fn=compose(
-                    load_records_csv_or_folder,
-                    add_to_input(
-                        path=config.path,
-                        header_length=config.header_length,
-                        mapping=config.fields,
+                fn=load_files_glob(
+                    config.glob,
+                    compose(
+                        load_records_csv,
+                        add_to_input(
+                            header_length=config.header_length,
+                            mapping=config.fields,
+                        ),
                     ),
                 ),
             ),

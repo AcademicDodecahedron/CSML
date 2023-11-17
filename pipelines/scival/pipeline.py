@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from lib import (
     TaskTree,
     table,
@@ -14,6 +12,7 @@ from lib import (
     compose,
     add_to_input,
 )
+from lib.utils import folder
 from .config import ScivalConfig
 from .nodes.load_records import load_records_csv_or_folder
 from .nodes.split_column import split_column, split_categories
@@ -35,8 +34,6 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
         map(lambda name: ValueColumnRendered(name, Sql("TEXT")), config.fields.values())
     )
 
-    parent_folder = Path(__file__).parent
-
     return {
         "records": {
             "load": MapToNewTable(
@@ -56,7 +53,7 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
             ),
             "dedupe": CreateTableSql(
                 table=table_records,
-                sql=parent_folder.joinpath("./nodes/dedupe_records.sql").read_text(),
+                sql=folder().joinpath("./nodes/dedupe_records.sql").read_text(),
                 params={"raw": table_records_raw, "record_columns": record_columns},
             ),
             "sgr": AddColumnsSql(
@@ -70,18 +67,18 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
         "sources": {
             "create": CreateTableSql(
                 table=table_sources,
-                sql=parent_folder.joinpath("./nodes/csml_source.sql").read_text(),
+                sql=folder().joinpath("./nodes/csml_source.sql").read_text(),
                 params={"records": table_records},
             ),
             "connect": AddColumnsSql(
                 table=table_records,
-                sql=parent_folder.joinpath("./nodes/map_source_id.sql").read_text(),
+                sql=folder().joinpath("./nodes/map_source_id.sql").read_text(),
                 params={"sources": table_sources},
             ),
         },
         "record_ids": CreateTableSql(
             table=table_record_ids,
-            sql=parent_folder.joinpath("./nodes/record_ids.sql").read_text(),
+            sql=folder().joinpath("./nodes/record_ids.sql").read_text(),
             params={"records": table_records},
         ),
         "record_authors": MapToNewTable(
@@ -128,7 +125,7 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
             ),
             "add_filename": CreateTableSql(
                 table=table_record_category,
-                sql=parent_folder.joinpath("./nodes/category_filename.sql").read_text(),
+                sql=folder().joinpath("./nodes/category_filename.sql").read_text(),
                 params={
                     "split": table_category_split,
                     "records": table_records,
@@ -138,12 +135,12 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
         },
         "record_topics": CreateTableSql(
             table=table_record_topics,
-            sql=parent_folder.joinpath("./nodes/record_topics.sql").read_text(),
+            sql=folder().joinpath("./nodes/record_topics.sql").read_text(),
             params={"records": table_records},
         ),
         "record_metrics": CreateTableSql(
             table=table_record_metrics,
-            sql=parent_folder.joinpath("./nodes/record_metrics.sql").read_text(),
+            sql=folder().joinpath("./nodes/record_metrics.sql").read_text(),
             params={"records": table_records},
         ),
     }

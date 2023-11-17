@@ -1,4 +1,3 @@
-from pathlib import Path
 from returns.maybe import Maybe
 
 from lib import (
@@ -16,6 +15,7 @@ from lib import (
     CreateTableSql,
     MapToNewColumns,
 )
+from lib.utils import folder
 from .nodes.loaders import load_files_glob, load_wos, load_incites
 from .nodes.record_authors import split_wos_authors
 from .nodes.rel_affiliations import parse_rel_affiliations, split_address
@@ -24,8 +24,6 @@ from .nodes.record_category import split_category
 from .nodes.database_record import make_database_record
 from .fields import WOS_COLUMNS, INCITES_COLUMNS, normalize_name
 from .config import WosConfig
-
-__dir__ = Path(__file__).parent
 
 
 def create_tasks(config: WosConfig) -> TaskTree:
@@ -88,12 +86,12 @@ def create_tasks(config: WosConfig) -> TaskTree:
         "records": {
             "create": CreateTableSql(
                 table=table_records,
-                sql=__dir__.joinpath("./nodes/records.sql").read_text(),
+                sql=folder().joinpath("./nodes/records.sql").read_text(),
                 params={"wos": table_wos, "incites": table_incites},
             ),
             "filename": CreateTableSql(
                 table=table_filename,
-                sql=__dir__.joinpath("./nodes/filename_association.sql").read_text(),
+                sql=folder().joinpath("./nodes/filename_association.sql").read_text(),
                 params={
                     "records": table_records,
                     "wos": table_wos,
@@ -115,7 +113,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
         "record_topics": {
             "create": CreateTableSql(
                 table=table_record_topics,
-                sql=__dir__.joinpath("./nodes/record_topics.sql").read_text(),
+                sql=folder().joinpath("./nodes/record_topics.sql").read_text(),
                 params={"records": table_records, "incites": table_incites},
             ),
             "split": MapToNewColumns(
@@ -130,7 +128,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
         },
         "record_metrics": CreateTableSql(
             table=table_record_metrics,
-            sql=__dir__.joinpath("./nodes/record_metrics.sql").read_text(),
+            sql=folder().joinpath("./nodes/record_metrics.sql").read_text(),
             params={"records": table_records, "incites": table_incites},
         ),
         "record_authors": MapToNewTable(
@@ -168,7 +166,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
         "record_affiliations": {
             "create": CreateTableSql(
                 table=table_record_affiliations,
-                sql=__dir__.joinpath("./nodes/record_affiliations.sql").read_text(),
+                sql=folder().joinpath("./nodes/record_affiliations.sql").read_text(),
                 params={
                     "rel_aff": table_rel_affiliations_raw,
                     "records": table_records,
@@ -191,15 +189,15 @@ def create_tasks(config: WosConfig) -> TaskTree:
             ),
             "connect": AddColumnsSql(
                 table=table_rel_affiliations_raw,
-                sql=__dir__.joinpath(
-                    "./nodes/record_affiliations_connect.sql"
-                ).read_text(),
+                sql=folder()
+                .joinpath("./nodes/record_affiliations_connect.sql")
+                .read_text(),
                 params={"record_affiliations": table_record_affiliations},
             ),
         },
         "rel_affiliations": CreateTableSql(
             table=table_rel_affiliations,
-            sql=__dir__.joinpath("./nodes/rel_affiliations_full.sql").read_text(),
+            sql=folder().joinpath("./nodes/rel_affiliations_full.sql").read_text(),
             params={
                 "raw": table_rel_affiliations_raw,
                 "authors": table_record_authors,
@@ -222,7 +220,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
             ),
             "combine": CreateTableSql(
                 table=table_record_category,
-                sql=__dir__.joinpath("./nodes/record_category.sql").read_text(),
+                sql=folder().joinpath("./nodes/record_category.sql").read_text(),
                 params={
                     "records": table_records,
                     "split": table_category_split,

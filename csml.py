@@ -15,7 +15,7 @@ class CsmlConfig(BaseModel):
     export: list[Path]
 
 
-app = typer.Typer()
+app = typer.Typer(add_completion=False)
 
 
 @app.command()

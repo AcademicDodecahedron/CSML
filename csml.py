@@ -1,9 +1,10 @@
 import typer
 import sqlite3
 import yaml
+import json
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import Annotated
+from typing import Annotated, Optional
 
 from lib import TaskIndex, sql_environment, sql_adapter, console, track
 from pipelines import SourceConfig
@@ -54,6 +55,19 @@ def run(
             conn.executescript(
                 sql_environment.render(script_path.read_text(), slice=slice)
             )
+
+
+@app.command()
+def config_schema(
+    output: Annotated[
+        Optional[typer.FileTextWrite], typer.Option("--output", "-o")
+    ] = None
+):
+    schema = CsmlConfig.model_json_schema()
+    if output:
+        json.dump(schema, output, indent=4)
+    else:
+        console.print_json(data=schema, indent=4)
 
 
 if __name__ == "__main__":

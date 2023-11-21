@@ -2,6 +2,7 @@
 # Please do not edit it manually.
 
 annotated-types==0.6.0
+click==8.1.7
 cssselect==1.2.0
 jinja2==3.1.2
 jmespath==1.0.1
@@ -18,5 +19,6 @@ pyyaml==6.0.1
 returns==0.22.0
 rich==13.6.0
 sqlglot==18.5.1
+typer==0.9.0
 typing-extensions==4.8.0
 w3lib==2.1.2

@@ -1,11 +1,15 @@
+import typer
 import sys
+from glob import iglob
+from typing import Annotated, Iterable, Optional
 import yaml
-from argparse import ArgumentParser
 from pathlib import Path
 from returns.maybe import Maybe
 
 from lib.console import console
 from pipelines.scival import ScivalConfig, HeaderLength, incites_csv_reader
+
+app = typer.Typer(add_completion=False, no_args_is_help=True)
 
 
 def load_csv_fieldnames(path: Path, header_length: HeaderLength) -> set[str]:
@@ -17,13 +21,13 @@ def load_csv_fieldnames(path: Path, header_length: HeaderLength) -> set[str]:
         )
 
 
-def load_file_or_folder_fieldnames(path: Path, header_length: HeaderLength):
-    csv_paths = iter(path.glob("*.csv") if path.is_dir() else [path])
+def load_fieldnames_check_same(paths: Iterable[Path], header_length: HeaderLength):
+    paths_iter = iter(paths)
 
-    csv_path = next(csv_paths)
+    csv_path = next(paths_iter)
     fieldnames = load_csv_fieldnames(csv_path, header_length)
 
-    for csv_path_other in csv_paths:
+    for csv_path_other in paths_iter:
         fieldnames_other = load_csv_fieldnames(csv_path_other, header_length)
 
         if fieldnames != fieldnames_other:
@@ -40,47 +44,34 @@ def load_file_or_folder_fieldnames(path: Path, header_length: HeaderLength):
     return fieldnames
 
 
-def load_config(path: Path):
-    with path.open() as config_file:
-        return ScivalConfig.model_validate(yaml.safe_load(config_file)["source"])
+class HeaderLengthArg:
+    def __init__(self, raw: str) -> None:
+        self.value: HeaderLength = "auto" if raw == "auto" else int(raw)
 
 
-def parse_args():
-    def parse_header_length(value: str) -> HeaderLength:
-        return "auto" if value == "auto" else int(value)
-
-    argparser = ArgumentParser()
-    argparser.add_argument(
-        "csv",
-        type=Path,
-        help="csv to read new field names from (can be a file or folder)",
-    )
-    argparser.add_argument(
-        "header_length",
-        type=parse_header_length,
-        help="number of lines to skip, or 'auto' for auto-detection",
-    )
-
-    argparser.add_argument(
-        "-c",
-        "--config",
-        type=Path,
-        help="config with the old mapping",
-    )
-
-    return argparser.parse_args()
-
-
-if __name__ == "__main__":
-    args = parse_args()
-
+@app.command(no_args_is_help=True)
+def check_scival_fields(
+    glob: Annotated[str, typer.Argument(help="Glob to find CSVs")],
+    header_length: Annotated[
+        HeaderLengthArg,
+        typer.Argument(
+            parser=HeaderLengthArg,
+            metavar="HEADERLENGTH",
+            help="number of lines to skip, or 'auto' for auto-detection",
+        ),
+    ],
+    config: Annotated[
+        Optional[typer.FileText],
+        typer.Option("-c", "--config", help="YAML config file"),
+    ] = None,
+):
     fields_old = (
-        Maybe.from_optional(args.config)
-        .map(load_config)
+        Maybe.from_optional(config)
+        .map(lambda file: ScivalConfig.model_validate(yaml.safe_load(file)["source"]))
         .map(lambda config: set(config.fields.keys()))
         .value_or(set())
     )
-    fields_new = load_file_or_folder_fieldnames(args.csv, args.header_length)
+    fields_new = load_fieldnames_check_same(map(Path, iglob(glob)), header_length.value)
 
     console.print("[bold]Missing fields:")
     for missing in fields_old - fields_new:
@@ -89,3 +80,9 @@ if __name__ == "__main__":
     console.print("\n[bold]New fields:")
     for new_field in fields_new - fields_old:
         console.print(f"[cyan]{new_field}")
+
+
+if __name__ == "__main__":
+    app()
+
+__all__ = ["check_scival_fields"]

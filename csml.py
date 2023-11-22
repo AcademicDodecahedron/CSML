@@ -8,6 +8,7 @@ from typing import Annotated, Optional
 
 from lib import TaskIndex, sql_environment, sql_adapter, console, track
 from pipelines import SourceConfig
+from check_scival_fields import check_scival_fields
 
 
 class CsmlConfig(BaseModel):
@@ -16,10 +17,10 @@ class CsmlConfig(BaseModel):
     export: list[Path]
 
 
-app = typer.Typer(add_completion=False)
+app = typer.Typer(add_completion=False, no_args_is_help=True)
 
 
-@app.command()
+@app.command(no_args_is_help=True)
 def run(
     output: Annotated[Path, typer.Argument(help="output sqlite database")],
     config_file: Annotated[
@@ -68,6 +69,9 @@ def config_schema(
         json.dump(schema, output, indent=4)
     else:
         console.print_json(data=schema, indent=4)
+
+
+app.command(no_args_is_help=True)(check_scival_fields)
 
 
 if __name__ == "__main__":

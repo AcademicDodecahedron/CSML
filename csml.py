@@ -24,7 +24,7 @@ class CsmlConfig(BaseModel):
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 
 
-@app.command(no_args_is_help=True)
+@app.command(no_args_is_help=True, help="Run pipeline defined in config")
 def run(
     output: Annotated[Path, typer.Argument(help="output sqlite database")],
     config_file: Annotated[
@@ -62,9 +62,14 @@ def run(
             )
 
 
-app.command(no_args_is_help=True)(check_scival_fields)
-app.command()(config_schema_for_class(CsmlConfig))
+app.command(
+    no_args_is_help=True,
+    help="Check if CSV fields correspond to those defined in config file",
+)(check_scival_fields)
+app.command(help="Export jsonschema for config")(config_schema_for_class(CsmlConfig))
 
+# Expose click object for documentation generation
+typer_click_object = typer.main.get_command(app)
 
 if __name__ == "__main__":
     app()

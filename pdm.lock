@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:dc06f011a0d8580400892b037a6d3fff743864c4db34997d524823430ba7b457"
+content_hash = "sha256:fa2c4acd6de17c7931befbd1b6eb66b638d511b3af767c8ffea68fec1e57df72"
 
 [[package]]
 name = "alabaster"
@@ -607,6 +607,21 @@ dependencies = [
 files = [
     {file = "sphinx-autobuild-2021.3.14.tar.gz", hash = "sha256:de1ca3b66e271d2b5b5140c35034c89e47f263f2cd5db302c9217065f7443f05"},
     {file = "sphinx_autobuild-2021.3.14-py3-none-any.whl", hash = "sha256:8fe8cbfdb75db04475232f05187c776f46f6e9e04cacf1e49ce81bdac649ccac"},
+]
+
+[[package]]
+name = "sphinx-click"
+version = "5.1.0"
+requires_python = ">=3.8"
+summary = "Sphinx extension that automatically documents click applications"
+dependencies = [
+    "click>=7.0",
+    "docutils",
+    "sphinx>=2.0",
+]
+files = [
+    {file = "sphinx-click-5.1.0.tar.gz", hash = "sha256:6812c2db62d3fae71a4addbe5a8a0a16c97eb491f3cd63fe34b4ed7e07236f33"},
+    {file = "sphinx_click-5.1.0-py3-none-any.whl", hash = "sha256:ae97557a4e9ec646045089326c3b90e026c58a45e083b8f35f17d5d6558d08a0"},
 ]
 
 [[package]]

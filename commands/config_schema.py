@@ -3,7 +3,6 @@ import typer
 from typing import Type, Annotated, Optional, cast
 from pydantic import BaseModel, PydanticUserError
 from pydantic.json_schema import (
-    DefsRef,
     GenerateJsonSchema,
     JsonSchemaMode,
     JsonSchemaValue,
@@ -80,9 +79,20 @@ class GenerateJsonSchemaNestedDefinitions(GenerateJsonSchema):
 def config_schema_for_class(config: Type[BaseModel]):
     def config_schema(
         output: Annotated[
-            Optional[typer.FileTextWrite], typer.Option("--output", "-o")
+            Optional[typer.FileTextWrite],
+            typer.Option(
+                "--output",
+                "-o",
+                help="Output JSON file. If omitted, will print to stdout",
+            ),
         ] = None,
-        nested: Annotated[bool, typer.Option("--nested")] = False,
+        nested: Annotated[
+            bool,
+            typer.Option(
+                "--nested",
+                help="Whether to use nested structure for $defs instead of flat (more readable when using sphinx-jsonschema)",
+            ),
+        ] = False,
     ):
         schema = config.model_json_schema(
             schema_generator=GenerateJsonSchemaNestedDefinitions

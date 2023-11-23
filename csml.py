@@ -4,11 +4,14 @@ import yaml
 import json
 from pathlib import Path
 from pydantic import BaseModel, Field
+from pydantic_core import CoreSchema
+from pydantic.json_schema import GenerateJsonSchema, JsonSchemaMode, JsonSchemaValue
+
 from typing import Annotated, Optional
 
 from lib import TaskIndex, sql_environment, sql_adapter, console, track
 from pipelines import SourceConfig
-from check_scival_fields import check_scival_fields
+from commands import check_scival_fields, config_schema_for_class
 
 
 class CsmlConfig(BaseModel):
@@ -62,6 +65,13 @@ def run(
             )
 
 
+class GenerateJsonSchemaNestedDefinitions(GenerateJsonSchema):
+    def generate(
+        self, schema: CoreSchema, mode: JsonSchemaMode = "validation"
+    ) -> JsonSchemaValue:
+        return super().generate(schema, mode)
+
+
 @app.command()
 def config_schema(
     output: Annotated[
@@ -77,6 +87,7 @@ def config_schema(
 
 
 app.command(no_args_is_help=True)(check_scival_fields)
+app.command()(config_schema_for_class(CsmlConfig))
 
 
 if __name__ == "__main__":

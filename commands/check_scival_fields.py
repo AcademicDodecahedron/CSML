@@ -9,8 +9,6 @@ from returns.maybe import Maybe
 from lib.console import console
 from pipelines.scival import ScivalConfig, HeaderLength, incites_csv_reader
 
-app = typer.Typer(add_completion=False, no_args_is_help=True)
-
 
 def load_csv_fieldnames(path: Path, header_length: HeaderLength) -> set[str]:
     with path.open(encoding="utf-8-sig") as csv_file:
@@ -49,7 +47,6 @@ class HeaderLengthArg:
         self.value: HeaderLength = "auto" if raw == "auto" else int(raw)
 
 
-@app.command(no_args_is_help=True)
 def check_scival_fields(
     glob: Annotated[str, typer.Argument(help="Glob to find CSVs")],
     header_length: Annotated[
@@ -81,8 +78,5 @@ def check_scival_fields(
     for new_field in fields_new - fields_old:
         console.print(f"[cyan]{new_field}")
 
-
-if __name__ == "__main__":
-    app()
 
 __all__ = ["check_scival_fields"]

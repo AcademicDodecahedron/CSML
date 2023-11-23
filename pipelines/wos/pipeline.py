@@ -184,7 +184,7 @@ def create_tasks(config: WosConfig) -> TaskTree:
                 ],
                 fn=compose_one(
                     split_address,
-                    add_to_input(config=config.address),
+                    add_to_input(config=config.wos.address),
                     pop_id_fields("id_record_affiliation"),
                 ),
             ),

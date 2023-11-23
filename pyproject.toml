@@ -18,3 +18,11 @@ dependencies = [
 requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "MIT"}
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "sphinx>=7.2.6",
+    "sphinx-autobuild>=2021.3.14",
+    "sphinx-material>=0.0.36",
+    "sphinx-jsonschema>=1.19.1",
+]

@@ -12,9 +12,13 @@ from check_scival_fields import check_scival_fields
 
 
 class CsmlConfig(BaseModel):
-    source: SourceConfig
-    sql_schema: list[Path] = Field(alias="schema")
-    export: list[Path]
+    source: SourceConfig = Field(description="Source-specifc configuration")
+    sql_schema: list[Path] = Field(
+        alias="schema", description="List of SQL scripts initializing the CSML schema"
+    )
+    export: list[Path] = Field(
+        description="List of SQL scripts copying data from the **tmp** schema into the main schema"
+    )
 
 
 app = typer.Typer(add_completion=False, no_args_is_help=True)
@@ -65,6 +69,7 @@ def config_schema(
     ] = None
 ):
     schema = CsmlConfig.model_json_schema()
+
     if output:
         json.dump(schema, output, indent=4)
     else:

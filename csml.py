@@ -1,13 +1,10 @@
 import typer
 import sqlite3
 import yaml
-import json
 from pathlib import Path
 from pydantic import BaseModel, Field
-from pydantic_core import CoreSchema
-from pydantic.json_schema import GenerateJsonSchema, JsonSchemaMode, JsonSchemaValue
 
-from typing import Annotated, Optional
+from typing import Annotated
 
 from lib import TaskIndex, sql_environment, sql_adapter, console, track
 from pipelines import SourceConfig
@@ -63,27 +60,6 @@ def run(
             conn.executescript(
                 sql_environment.render(script_path.read_text(), slice=slice)
             )
-
-
-class GenerateJsonSchemaNestedDefinitions(GenerateJsonSchema):
-    def generate(
-        self, schema: CoreSchema, mode: JsonSchemaMode = "validation"
-    ) -> JsonSchemaValue:
-        return super().generate(schema, mode)
-
-
-@app.command()
-def config_schema(
-    output: Annotated[
-        Optional[typer.FileTextWrite], typer.Option("--output", "-o")
-    ] = None
-):
-    schema = CsmlConfig.model_json_schema()
-
-    if output:
-        json.dump(schema, output, indent=4)
-    else:
-        console.print_json(data=schema, indent=4)
 
 
 app.command(no_args_is_help=True)(check_scival_fields)

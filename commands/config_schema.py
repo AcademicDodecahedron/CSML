@@ -86,18 +86,18 @@ def config_schema_for_class(config: Type[BaseModel]):
                 help="Output JSON file. If omitted, will print to stdout",
             ),
         ] = None,
-        nested: Annotated[
+        nested_defs: Annotated[
             bool,
             typer.Option(
-                "--nested",
+                "--nested-defs",
                 help="Whether to use nested structure for $defs instead of flat (more readable when using sphinx-jsonschema)",
             ),
         ] = False,
     ):
         schema = config.model_json_schema(
             schema_generator=GenerateJsonSchemaNestedDefinitions
-            if nested
-            else GenerateJsonSchema
+            if nested_defs
+            else GenerateJsonSchema,
         )
 
         if output:

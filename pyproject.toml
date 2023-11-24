@@ -23,8 +23,7 @@ license = {text = "MIT"}
 dev = [
     "sphinx>=7.2.6",
     "sphinx-autobuild>=2021.3.14",
-    "sphinx-material>=0.0.36",
     "sphinx-jsonschema>=1.19.1",
     "sphinx-click>=5.1.0",
-    "sphinxcontrib-jquery>=4.1",
+    "sphinx-immaterial>=0.11.9",
 ]

@@ -1,15 +1,6 @@
 import click
 from returns.maybe import Maybe
-
-
-def _indent(text: str, level: int = 1) -> str:
-    prefix = " " * (4 * level)
-
-    def prefixed_lines():
-        for line in text.splitlines(True):
-            yield (prefix + line if line.strip() else line)
-
-    return "".join(prefixed_lines())
+from sphinx_click.ext import _indent
 
 
 def format_arguments(ctx: click.Context):
@@ -32,10 +23,9 @@ def format_arguments(ctx: click.Context):
         yield ""
 
 
-def replace_arguments(app, ctx: click.Context, lines: list[str]):
-    lines.clear()
-    lines.extend(format_arguments(ctx))
-
-
 def setup(app):
+    def replace_arguments(app, ctx: click.Context, lines: list[str]):
+        lines.clear()
+        lines.extend(format_arguments(ctx))
+
     app.connect("sphinx-click-process-arguments", replace_arguments)

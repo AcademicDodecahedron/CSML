@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal, Optional, Annotated
 from pydantic import BaseModel, Field
 
 
@@ -7,20 +7,18 @@ class SourceParams(BaseModel):
 
 
 class UssrParams(BaseModel):
-    republics: list[str] = Field(
-        default_factory=list, description="List of Soviet republics"
-    )
+    republics: Annotated[list[str], Field(description="List of Soviet republics")] = []
 
 
 class AddressParams(BaseModel):
-    ussr: UssrParams = Field(default_factory=UssrParams)
+    ussr: UssrParams = UssrParams()
 
 
 class WosSourceParams(SourceParams):
-    address: AddressParams = Field(
-        default_factory=AddressParams,
-        description="Settings for country-specific address parsing",
-    )
+    address: Annotated[
+        AddressParams,
+        Field(description="Settings for country-specific address parsing"),
+    ] = AddressParams()
 
 
 class WosConfig(BaseModel):

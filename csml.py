@@ -30,7 +30,9 @@ def run(
     config_file: Annotated[
         typer.FileText, typer.Option("--config", "-c", help="YAML config file")
     ],
-    slice: Annotated[int, typer.Option("--slice", "-s", help="id_slice value")] = 0,
+    slice: Annotated[
+        int, typer.Option("--slice", "-s", help="id_slice column value")
+    ] = 0,
     continue_: Annotated[
         bool, typer.Option("--continue", help="don't clear the temporary database")
     ] = False,

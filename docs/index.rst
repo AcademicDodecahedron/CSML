@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pure-cube's documentation!
+Welcome to csml-cube's documentation!
 =====================================
 
 .. toctree::
@@ -12,12 +12,3 @@ Welcome to pure-cube's documentation!
 
    usage/config
    usage/cli
-
-
-
-.. Indices and tables
-.. ==================
-..
-.. * :ref:`genindex`
-.. * :ref:`modindex`
-.. * :ref:`search`

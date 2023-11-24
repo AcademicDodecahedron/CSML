@@ -6,14 +6,19 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "pure-cube"
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.joinpath("./_extensions")))
+
+project = "csml-cube"
 copyright = "2023, snorkysnark"
 author = "snorkysnark"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx-jsonschema", "sphinx_click"]
+extensions = ["sphinx-jsonschema", "sphinx_click", "sphinx_typer_argument_help"]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]

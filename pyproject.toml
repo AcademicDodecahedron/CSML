@@ -26,4 +26,5 @@ dev = [
     "sphinx-material>=0.0.36",
     "sphinx-jsonschema>=1.19.1",
     "sphinx-click>=5.1.0",
+    "sphinxcontrib-jquery>=4.1",
 ]

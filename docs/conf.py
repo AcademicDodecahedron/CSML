@@ -18,7 +18,12 @@ author = "snorkysnark"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx-jsonschema", "sphinx_click", "sphinx_typer_argument_help"]
+extensions = [
+    "sphinx-jsonschema",
+    "sphinx_click",
+    "sphinxcontrib.jquery",
+    "sphinx_typer_argument_help",
+]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]

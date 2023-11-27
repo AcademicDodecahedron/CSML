@@ -12,7 +12,9 @@ from commands import check_scival_fields, config_schema_for_class
 
 
 class CsmlConfig(BaseModel):
-    source: SourceConfig = Field(description="Source-specifc configuration")
+    source: SourceConfig = Field(
+        description="Source-specifc configuration", discriminator="type"
+    )
     sql_schema: list[Path] = Field(
         alias="schema", description="List of SQL scripts initializing the CSML schema"
     )

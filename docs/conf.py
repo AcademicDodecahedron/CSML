@@ -23,6 +23,8 @@ extensions = [
     "sphinx_typer_argument_help",
     "sphinx_immaterial",
     "sphinx_immaterial.apidoc.json.domain",
+    "sphinx_immaterial.graphviz",
+    "sphinx.ext.autosectionlabel",
 ]
 
 templates_path = ["_templates"]
@@ -36,3 +38,5 @@ html_theme = "sphinx_immaterial"
 html_static_path = ["_static"]
 
 json_schemas = ["config_schema.json"]
+
+autosectionlabel_prefix_document = True

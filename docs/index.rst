@@ -1,8 +1,3 @@
-.. pure-cube documentation master file, created by
-   sphinx-quickstart on Wed Nov 22 16:47:44 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to csml-cube's documentation!
 =====================================
 
@@ -10,5 +5,6 @@ Welcome to csml-cube's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   usage/config
-   usage/cli
+   usage
+   reference/config
+   reference/cli

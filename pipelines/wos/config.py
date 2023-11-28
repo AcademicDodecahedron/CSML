@@ -7,7 +7,15 @@ class SourceParams(BaseModel):
 
 
 class UssrParams(BaseModel):
-    republics: Annotated[list[str], Field(description="List of Soviet republics")] = []
+    republics: Annotated[
+        list[str],
+        Field(
+            description="""\
+List of Soviet republics
+
+Since ordering is inconsistent, the parser needs to distinguish them from city names"""
+        ),
+    ] = []
 
 
 class AddressParams(BaseModel):

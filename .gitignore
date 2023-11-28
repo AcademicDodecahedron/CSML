@@ -168,5 +168,4 @@ cython_debug/
 .vscode/
 /console/
 
-*.yml
-!scival.yml
+/*.yml

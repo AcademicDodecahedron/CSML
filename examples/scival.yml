@@ -1,7 +1,7 @@
 source:
   type: scival
-  glob: ../scival_kedro/страны/*.csv
-  header_length: 19
+  glob: ../scival/*.csv
+  header_length: auto
   fields:
     Outputs in Top Citation Percentiles, per percentile: outputs_in_top_citation_percentiles_per_percentile
     Country/Region: country

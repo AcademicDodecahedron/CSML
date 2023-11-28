@@ -1,0 +1,31 @@
+source:
+  type: wos
+  wos:
+    glob: ../wos/savedrecs*.txt
+    address:
+      ussr:
+        republics:
+          - UZBEKISTAN
+          - BELORUSSIA
+          - TURKMENISTAN
+          - KAZAKHSTAN
+          - TADZHIKISTAN
+          - UKRAINE
+          - MOLDAVIA
+          - LITHUANIA
+          - GEORGIA
+          - ARMENIA
+          - LATVIA
+          - AZERBAIJAN
+  incites:
+    glob: ../wos/Web of Science Documents*.csv
+
+schema:
+  - ./sql/schema/csml_source.sql
+  - ./sql/schema/pure_record.sql
+  - ./sql/schema/csml_record_topics.sql
+  - ./sql/schema/csml_record_metrics.sql
+  - ./sql/schema/csml_database_record.sql
+
+export:
+  - ./sql/export/export_wos.sql

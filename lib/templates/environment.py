@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import Any, Iterable, MutableMapping, Optional
+from typing import Any, Callable, Iterable, MutableMapping, Optional
 from jinja2 import Environment, Template
+import jinja2.utils
 import textwrap
 
 from .extension import SqltypedExtension
@@ -32,6 +33,10 @@ def _sqljoin_filter(
 def _sql_filter(value: str) -> Sql:
     return Sql(value)
 
+def _sqljoiner(sep: str = ", ") -> Callable[[], Sql]:
+    joiner = jinja2.utils.Joiner(sep)
+    return lambda: Sql(joiner())
+
 
 class SqlEnvironment(Environment):
     def __init__(self):
@@ -43,6 +48,8 @@ class SqlEnvironment(Environment):
         self.add_extension(SqltypedExtension)
 
         self.globals["Column"] = Column
+        self.globals["sqljoiner"] = _sqljoiner
+
         self.filters["sqltyped"] = _sqltyped_filter
         self.filters["sqljoin"] = _sqljoin_filter
         self.filters["sql"] = _sql_filter

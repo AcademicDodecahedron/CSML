@@ -1,7 +1,6 @@
 from lib import (
     TaskTree,
     table,
-    identifier,
     MapToNewTable,
     CreateTableSql,
     AddColumnsSql,
@@ -111,9 +110,10 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
             "split": MapToNewTable(
                 source_table=table_records,
                 select="""\
+                {% set sep = sqljoiner(',\\n') -%}
                 SELECT
-                id_record,
-                {{ select | sqljoin(',\\n') }}
+                {{ sep() }}id_record
+                {%- for name in select %}{{ sep() }}{{ name | identifier }}{% endfor %}
                 FROM {{source}}""",
                 table=table_category_split,
                 columns=[
@@ -123,7 +123,7 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
                     ValueColumn("id_record", "INT REFERENCES {{source}}(id_record)"),
                 ],
                 fn=split_categories(config.category_mapping),
-                params={"select": map(identifier, config.category_mapping.keys())},
+                params={"select": config.category_mapping.keys()},
             ),
             "add_filename": CreateTableSql(
                 table=table_record_category,

@@ -6,7 +6,7 @@ import textwrap
 
 from .extension import SqltypedExtension
 from .adapter import sql_adapter, Sql
-from .types import Column
+from .types import Column, identifier, placeholder
 
 
 def _sqltyped_filter(value: Any) -> str:
@@ -30,9 +30,6 @@ def _sqljoin_filter(
     )
 
 
-def _sql_filter(value: str) -> Sql:
-    return Sql(value)
-
 def _sqljoiner(sep: str = ", ") -> Callable[[], Sql]:
     joiner = jinja2.utils.Joiner(sep)
     return lambda: Sql(joiner())
@@ -52,7 +49,9 @@ class SqlEnvironment(Environment):
 
         self.filters["sqltyped"] = _sqltyped_filter
         self.filters["sqljoin"] = _sqljoin_filter
-        self.filters["sql"] = _sql_filter
+        self.filters["sql"] = Sql
+        self.filters["identifier"] = identifier
+        self.filters["placeholder"] = placeholder
 
     def from_string(
         self,

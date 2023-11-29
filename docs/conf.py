@@ -35,7 +35,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "sphinx_immaterial"
 html_static_path = ["_static"]
-html_title = "csml-cube"
+html_title = "CSML Cube Importer"
 
 json_schemas = ["config_schema.json"]
 

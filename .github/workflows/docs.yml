@@ -1,0 +1,31 @@
+name: documentation
+
+on: push
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v3
+        with:
+          python-version: 3.11
+          update-python: true
+          cache: true
+      - name: Install dependencies
+        run: pdm install
+      - name: Generate JSON Schema
+        run: pdm run python csml.py config-schema -o ./docs/config_schema.json --docs
+      - name: Build docs
+        run: pdm run sphinx-build docs docs/_build
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build
+          force_orphan: true

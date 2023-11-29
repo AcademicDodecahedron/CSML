@@ -22,6 +22,8 @@ jobs:
         run: pdm run python csml.py config-schema -o ./docs/config_schema.json --docs
       - name: Build docs
         run: pdm run sphinx-build docs docs/_build
+        env:
+          PYTHONPATH: .
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:

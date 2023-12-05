@@ -77,3 +77,7 @@ select id_record,
        iscluster,
        ProminencePercentile
 from tmp.record_topics;
+
+insert into work_slice_staff ("ScopusName", "ScopusAff", "ScopusID")
+select "ScopusName", "ScopusAff", "ScopusID"
+from tmp.work_slice_staff;

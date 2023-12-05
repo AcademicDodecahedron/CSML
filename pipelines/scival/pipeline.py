@@ -10,6 +10,7 @@ from lib import (
     compose,
     add_to_input,
 )
+from returns.maybe import Maybe
 from lib.utils import folder
 from pipelines.glob import load_files_glob
 from .config import ScivalConfig
@@ -28,6 +29,8 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
     table_record_category = table("record_category")
     table_record_topics = table("record_topics")
     table_record_metrics = table("record_metrics")
+
+    table_work_slice_staff = table("work_slice_staff")
 
     record_columns = list(
         map(lambda name: ValueColumnRendered(name, "TEXT"), config.fields.values())
@@ -144,5 +147,29 @@ def create_tasks(config: ScivalConfig) -> TaskTree:
             table=table_record_metrics,
             sql=folder().joinpath("./nodes/record_metrics.sql").read_text(),
             params={"records": table_records},
+        ),
+        "work_slice_staff": MapToNewTable(
+            table=table_work_slice_staff,
+            columns=[
+                ValueColumn("ScopusName", "TEXT"),
+                ValueColumn("ScopusAff", "TEXT"),
+                ValueColumn("ScopusID", "TEXT"),
+            ],
+            fn=load_files_glob(
+                Maybe.from_optional(config.authors)
+                .map(lambda authors: authors.glob)
+                .value_or(None),
+                compose(
+                    load_records_csv,
+                    add_to_input(
+                        header_length=Maybe.from_optional(config.authors)
+                        .map(lambda authors: authors.header_length)
+                        .value_or(None),
+                        mapping=Maybe.from_optional(config.authors)
+                        .map(lambda authors: authors.fields)
+                        .value_or(None),
+                    ),
+                ),
+            ),
         ),
     }

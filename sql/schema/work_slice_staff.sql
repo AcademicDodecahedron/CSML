@@ -1,0 +1,31 @@
+create table work_slice_staff
+(
+    id_work_slice_staff      integer not null
+            primary key autoincrement,
+    id_work_slice            integer,
+    id_work_slice_subunit    integer,
+    tabel_num                text,
+    age_staff                integer,
+    qualification_ru         text,
+    award_date               text,
+    qualification_ru2        text,
+    qualification_start_date text,
+    job_description_ru       text,
+    subunit_1                text,
+    subunit_2                text,
+    subunit_3                text,
+    fte                      text,
+    association              text,
+    employments              text,
+    citizenship              text,
+    "ScopusID"               text,
+    orcid                    text,
+    "ResearcherID"           text,
+    "elibrary_AuthorID"      text,
+    fio                      text,
+    year_first_publ          text,
+    key_path                 text,
+    count_fraction           integer,
+    "ScopusName"               text,
+    "ScopusAff"               text
+);

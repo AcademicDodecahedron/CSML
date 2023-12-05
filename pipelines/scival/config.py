@@ -1,9 +1,15 @@
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 from . import pipeline
 
 HeaderLength = int | Literal["auto"]
+
+
+class AuthorsConfig(BaseModel):
+    glob: str
+    header_length: HeaderLength
+    fields: dict[str, str]
 
 
 class ScivalConfig(BaseModel):
@@ -26,6 +32,7 @@ class ScivalConfig(BaseModel):
     category_mapping: dict[str, int] = Field(
         description="Mapping a column name from **fields** to the corresponding ``csml_record_category.type_category`` id"
     )
+    authors: Optional[AuthorsConfig] = None
 
     def create_tasks(self):
         return pipeline.create_tasks(self)

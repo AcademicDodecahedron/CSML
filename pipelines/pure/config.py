@@ -12,6 +12,7 @@ class PureConfig(BaseModel):
     internalorg: XmlSource
     externalorg: XmlSource
     type_pure_org_ids: dict[str, int] = {}
+    internalperson: XmlSource
 
     def create_tasks(self):
         from .pipeline import create_tasks

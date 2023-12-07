@@ -16,6 +16,7 @@ from pipelines.glob import load_files_glob
 from .nodes.parse_internalorgs import parse_internalorgs_file
 from .nodes.parse_externalorgs import parse_externalorgs_file
 from .nodes.parse_org_ids import parse_org_ids
+from .nodes.parse_internalpersons import parse_internalpersons_file
 
 
 def create_tasks(config: PureConfig) -> TaskTree:
@@ -23,6 +24,7 @@ def create_tasks(config: PureConfig) -> TaskTree:
     table_externalorg = table("externalorg")
     table_orgs = table("orgs")
     table_org_ids = table("org_ids")
+    table_internalperson = table("internalperson")
 
     return {
         "orgs": {
@@ -83,5 +85,24 @@ def create_tasks(config: PureConfig) -> TaskTree:
                 table=table_orgs,
                 sql=folder().joinpath("./nodes/add_search_path.sql").read_text(),
             ),
-        }
+        },
+        "internalperson": MapToNewTable(
+            table=table_internalperson,
+            columns=[
+                ValueColumn("filename", "TEXT"),
+                ValueColumn("uuid", "TEXT"),
+                ValueColumn("first_name", "TEXT"),
+                ValueColumn("last_name", "TEXT"),
+                ValueColumn("date_of_birth", "TEXT"),
+                ValueColumn("year_or_birth", "INT"),
+                ValueColumn("orcid", "TEXT"),
+                ValueColumn("year", "INT"),
+                ValueColumn("education", "TEXT"),
+                ValueColumn("qualification", "TEXT"),
+                ValueColumn("name_variants", "TEXT"),
+                ValueColumn("ids", "TEXT"),
+                ValueColumn("staff_org_ass", "TEXT"),
+            ],
+            fn=load_files_glob(config.internalperson.glob, parse_internalpersons_file),
+        ),
     }

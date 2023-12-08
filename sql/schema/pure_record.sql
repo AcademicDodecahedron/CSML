@@ -327,3 +327,10 @@ create table csml_record_pure_org_slice
         unique (id_pure_org_slice, type_record_org_slice, id_record)
 );
 
+create table csml_record_project
+(
+    id_record  INT not null
+        references csml_record,
+    id_project INT not null
+        references csml_pure_project
+);

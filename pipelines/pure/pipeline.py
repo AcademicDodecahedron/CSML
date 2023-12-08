@@ -31,6 +31,7 @@ from .nodes.parse_records import (
     parse_record_org_units,
     parse_projects,
 )
+from .nodes.parse_journals import parse_journals_file
 
 
 def create_tasks(config: PureConfig) -> TaskTree:
@@ -52,6 +53,7 @@ def create_tasks(config: PureConfig) -> TaskTree:
     table_person_name_variants = table("person_name_variants")
     table_person_ids = table("person_ids")
     table_person_associations = table("person_associations")
+    table_journals = table("journals")
 
     return {
         "internalorg": MapToNewTable(
@@ -364,5 +366,24 @@ def create_tasks(config: PureConfig) -> TaskTree:
             table=table_record_authors,
             sql=folder().joinpath("./nodes/map_record_authors.sql").read_text(),
             params={"person": table_person},
+        ),
+        "journals": MapToNewTable(
+            table=table_journals,
+            columns=[
+                "source_id INTEGER PRIMARY KEY AUTOINCREMENT",
+                ValueColumn("filename", "TEXT"),
+                ValueColumn("uuid", "TEXT UNIQUE"),
+                ValueColumn("source_title", "TEXT"),
+                ValueColumn("source_type", "TEXT"),
+                ValueColumn("issn_norm", "TEXT"),
+                ValueColumn("publisher", "TEXT"),
+                ValueColumn("country", "TEXT"),
+            ],
+            fn=load_files_glob(config.journals.glob, parse_journals_file),
+        ),
+        "journals_map": AddColumnsSql(
+            table=table_record,
+            sql=folder().joinpath("./nodes/map_journals.sql").read_text(),
+            params={"journals": table_journals},
         ),
     }

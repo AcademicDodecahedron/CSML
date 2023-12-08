@@ -1,3 +1,24 @@
+INSERT INTO csml_source(
+    id_source,
+    id_slice,
+    num_source,
+    source_title,
+    source_type,
+    issn_norm,
+    publisher,
+    source_country
+)
+select
+    source_id,
+    {{slice}},
+    uuid,
+    source_title,
+    source_type,
+    issn_norm,
+    publisher,
+    country
+from tmp.journals;
+
 insert into csml_pure_org
 select org_id,
        {{slice}}      as id_slice,
@@ -61,7 +82,7 @@ select id_person,
 from tmp.person_associations;
 
 insert into csml_record(id_record, id_slice, type_database_record, num_record, doi, year_publ, source_type,
-                        source_title, document_type, issn_norm, scopus_sourceid)
+                        source_title, document_type, issn_norm, scopus_sourceid, id_source)
 select id_record,
        {{slice}}        as id_slice,
        4             as type_database_record,
@@ -72,7 +93,8 @@ select id_record,
        journal_title as source_title,
        output_type   as document_type,
        issn,
-       journal_uuid
+       journal_uuid,
+       source_id
 from tmp.record
 where record_uuid is not null;
 

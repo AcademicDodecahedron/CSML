@@ -17,6 +17,7 @@ class PureConfig(BaseModel):
     type_pure_person_id: dict[str, int] = {}
     type_pure_person_name: dict[str, int] = {}
     type_record_ids: dict[str, int] = {}
+    journals: XmlSource
 
     def create_tasks(self):
         from .pipeline import create_tasks

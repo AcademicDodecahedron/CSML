@@ -91,9 +91,9 @@ class MapToNewTable(Task):
                 conn.execute(self._insert, output_row)
 
         if self._select:
-            cursor = conn.cursor(with_dict_factory).execute(self._select)
             for input_row in track(
-                cursor, description="Task progress...", total=cursor.rowcount
+                conn.cursor(with_dict_factory).execute(self._select).fetchall(),
+                description="Task progress...",
             ):
                 process_input(**input_row)
         else:

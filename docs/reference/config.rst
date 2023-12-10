@@ -21,3 +21,9 @@ Web of Science
 .. json:schema:: WosSourceParams
 .. json:schema:: AddressParams
 .. json:schema:: UssrParams
+
+Pure
+----
+
+.. json:schema:: PureConfig
+.. json:schema:: XmlSource

@@ -37,8 +37,8 @@ source:
     DOI: doi
     Scopus Source title: scopus_source_title
     Scopus Affiliation names: scopus_affiliation_names
-    Time Higher Education (THE) field name: THE_field_name
-    Time Higher Education (THE) code: THE_code
+    Times Higher Education (THE) field name: THE_field_name
+    Times Higher Education (THE) code: THE_code
     Source type: source_type
     SNIP (publication year): snip
     Topic name: topic_name

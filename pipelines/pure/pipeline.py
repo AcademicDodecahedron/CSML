@@ -66,7 +66,10 @@ def create_tasks(config: PureConfig) -> TaskTree:
                 ValueColumn("name_pure_org_eng", "TEXT"),
                 ValueColumn("ids", "TEXT"),
             ],
-            fn=load_files_glob(config.internalorg.glob, parse_internalorgs_file),
+            fn=load_files_glob(
+                config.internalorg.glob if config.internalorg else None,
+                parse_internalorgs_file,
+            ),
         ),
         "externalorg": MapToNewTable(
             table=table_externalorg,
@@ -81,7 +84,10 @@ def create_tasks(config: PureConfig) -> TaskTree:
                 ValueColumn("city_org", "TEXT"),
                 ValueColumn("ids", "TEXT"),
             ],
-            fn=load_files_glob(config.externalorg.glob, parse_externalorgs_file),
+            fn=load_files_glob(
+                config.externalorg.glob if config.externalorg else None,
+                parse_externalorgs_file,
+            ),
         ),
         "internalperson": MapToNewTable(
             table=table_internalperson,
@@ -100,7 +106,10 @@ def create_tasks(config: PureConfig) -> TaskTree:
                 ValueColumn("ids", "TEXT"),
                 ValueColumn("staff_org_ass", "TEXT"),
             ],
-            fn=load_files_glob(config.internalperson.glob, parse_internalpersons_file),
+            fn=load_files_glob(
+                config.internalperson.glob if config.internalperson else None,
+                parse_internalpersons_file,
+            ),
         ),
         "record": {
             "load": MapToNewTable(
@@ -124,7 +133,9 @@ def create_tasks(config: PureConfig) -> TaskTree:
                     ValueColumn("organisational_units", "TEXT"),
                     ValueColumn("related_projects", "TEXT"),
                 ],
-                fn=load_files_glob(config.records.glob, parse_records_file),
+                fn=load_files_glob(
+                    config.records.glob if config.records else None, parse_records_file
+                ),
             ),
             "categories": MapToNewTable(
                 source_table=table_record,
@@ -379,7 +390,9 @@ def create_tasks(config: PureConfig) -> TaskTree:
                 ValueColumn("publisher", "TEXT"),
                 ValueColumn("country", "TEXT"),
             ],
-            fn=load_files_glob(config.journals.glob, parse_journals_file),
+            fn=load_files_glob(
+                config.journals.glob if config.journals else None, parse_journals_file
+            ),
         ),
         "journals_map": AddColumnsSql(
             table=table_record,

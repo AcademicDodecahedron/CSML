@@ -133,6 +133,7 @@ INSERT INTO csml_type_category (type_category, name_type_category, type_category
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (27, 'Институт/Факультет', 'Local Org System ');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (30, 'Парк или Университет', 'Local Org System');
 INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (37, 'Source File', 'MultiFiles Load');
+INSERT INTO csml_type_category (type_category, name_type_category, type_category_database) VALUES (38, 'elibrary_source_kind', 'ELibrary');
 
 
 create table csml_record_category

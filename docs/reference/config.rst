@@ -27,3 +27,8 @@ Pure
 
 .. json:schema:: PureConfig
 .. json:schema:: XmlSource
+
+eLibrary
+--------
+
+.. json:schema:: ElibraryConfig

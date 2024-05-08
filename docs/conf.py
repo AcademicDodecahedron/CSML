@@ -18,6 +18,7 @@ author = "snorkysnark"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
 extensions = [
     "sphinx_click",
     "sphinx_typer_argument_help",

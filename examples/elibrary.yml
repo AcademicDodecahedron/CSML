@@ -1,0 +1,10 @@
+source:
+  type: elibrary
+  glob: ../StPUniv/*
+  encoding: utf-8-sig
+
+schema:
+  - ./sql/schema/csml_source.sql
+  - ./sql/schema/pure_record.sql
+export:
+  - ./sql/export/export_elibrary.sql

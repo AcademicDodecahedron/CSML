@@ -16,9 +16,11 @@ SELECT id_record, 10, grnti
 FROM {{records}}
 WHERE grnti IS NOT NULL;
 
+{% for kind in ['vak', 'rsci', 'wos', 'scopus'] %}
 INSERT INTO {{table}}
 SELECT
     id_record,
     38,
-    vak || '#' || rsci || '#' || wos || '#' || scopus
-FROM {{records}};
+    {{ kind + "#" }} || {{ kind | sql }}
+FROM {{records}} WHERE {{ kind | sql }} IS NOT NULl;
+{% endfor %}

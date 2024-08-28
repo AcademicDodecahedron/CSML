@@ -1,6 +1,6 @@
 import re
 
-_DELIMITER = re.compile(r"|\s*")
+_DELIMITER = re.compile(r"\|\s*")
 
 
 def split_column(column_name: str):

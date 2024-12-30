@@ -1,7 +1,6 @@
 create table csml_source
 (
-    id_source                   serial
-        primary key,
+    id_source                   integer primary key autoincrement,
     id_slice                    integer           not null,
     num_source                  text,
     source_title                text,
